@@ -25,10 +25,12 @@ function deviceIssues(d: Device): Issue[] {
   }
   for (const id of d.identifiers) {
     if (!id.value.trim()) continue;
-    const check = id.type === "IMEI" ? checkImei(id.value) : id.type === "MAC" ? checkMac(id.value) : id.type === "EID" ? checkEid(id.value) : null;
+    const check =
+      id.type === "IMEI" ? checkImei(id.value) : id.type === "MAC" ? checkMac(id.value) : id.type === "EID" ? checkEid(id.value) : null;
     if (check && check.severity !== "ok") warn(`${id.type} ${id.value}: ${check.message}`);
   }
-  if (!Object.values(d.relation).some(Boolean)) warn("Part A asks whether the device is Owned / Maintained / Managed / Operated by you; none is ticked.");
+  if (!Object.values(d.relation).some(Boolean))
+    warn("Part A asks whether the device is Owned / Maintained / Managed / Operated by you; none is ticked.");
   if (d.sourceKind === "dvr" && !d.clock) warn("For CCTV, record how far the recorder's clock differs from real time (clock check).");
   return out;
 }
@@ -37,26 +39,53 @@ export function checkCase(c: CaseFile): Issue[] {
   const issues: Issue[] = [];
   const add = (i: Issue) => issues.push(i);
 
-  if (!c.party.name.trim()) add({ severity: "warning", where: "party", refId: null, message: "Your name (the person signing Part A) is empty." });
+  if (!c.party.name.trim())
+    add({ severity: "warning", where: "party", refId: null, message: "Your name (the person signing Part A) is empty." });
   if (!c.party.address.trim()) add({ severity: "warning", where: "party", refId: null, message: "'Residing/employed at' is empty." });
   if (!c.algorithms.sha256 && !c.algorithms.sha1 && !c.algorithms.md5) {
-    add({ severity: "error", where: "case", refId: null, message: "Choose at least one hash algorithm to declare (SHA-256 is recommended)." });
+    add({
+      severity: "error",
+      where: "case",
+      refId: null,
+      message: "Choose at least one hash algorithm to declare (SHA-256 is recommended).",
+    });
   }
 
   const included = c.records.filter((r) => r.includeInCertificate);
-  if (included.length === 0) add({ severity: "error", where: "case", refId: null, message: "Add at least one electronic record and include it in the certificate." });
+  if (included.length === 0)
+    add({
+      severity: "error",
+      where: "case",
+      refId: null,
+      message: "Add at least one electronic record and include it in the certificate.",
+    });
 
   for (const r of included) {
     if (!r.deviceId || !c.devices.some((d) => d.id === r.deviceId)) {
-      add({ severity: "error", where: "record", refId: r.id, message: `${r.label} (${r.fileName}) is not linked to a device. Every record must name the device it came from.` });
+      add({
+        severity: "error",
+        where: "record",
+        refId: r.id,
+        message: `${r.label} (${r.fileName}) is not linked to a device. Every record must name the device it came from.`,
+      });
     }
     if (!r.manner.trim()) {
       add({ severity: "warning", where: "record", refId: r.id, message: `${r.label}: describe how the record was produced (s.63(4)(a)).` });
     } else if (/\[[^\]]+\]/.test(r.manner)) {
-      add({ severity: "warning", where: "record", refId: r.id, message: `${r.label}: "how it was produced" still has blanks in [brackets] to replace.` });
+      add({
+        severity: "warning",
+        where: "record",
+        refId: r.id,
+        message: `${r.label}: "how it was produced" still has blanks in [brackets] to replace.`,
+      });
     }
     if (r.crcOk === false) {
-      add({ severity: "warning", where: "record", refId: r.id, message: `${r.label}: the zip's own checksum does not match. The archive may be damaged; re-export before filing.` });
+      add({
+        severity: "warning",
+        where: "record",
+        refId: r.id,
+        message: `${r.label}: the zip's own checksum does not match. The archive may be damaged; re-export before filing.`,
+      });
     }
   }
 

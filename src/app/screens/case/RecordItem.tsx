@@ -65,7 +65,13 @@ export function RecordItem({ record: r, caseFile: c, fresh, child = false, onCha
       <div className="hash" style={{ gridTemplateColumns: "5.2rem 1fr auto" }}>
         <span className="alg">SHA-256</span>
         <span className="value">{r.hashes.sha256}</span>
-        <button type="button" className="btn link" onClick={() => setOpen(!open)} aria-expanded={open} aria-label={`${open ? "Close" : "Open"} details of ${r.label}`}>
+        <button
+          type="button"
+          className="btn link"
+          onClick={() => setOpen(!open)}
+          aria-expanded={open}
+          aria-label={`${open ? "Close" : "Open"} details of ${r.label}`}
+        >
           {open ? "Close" : "Details"}
         </button>
       </div>

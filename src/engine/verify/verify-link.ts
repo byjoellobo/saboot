@@ -85,6 +85,8 @@ class Writer {
  * from a link, so a crafted name cannot visually disguise itself.
  */
 export function cleanLinkText(text: string): string {
+  // Matching control characters is the point of this function.
+  // eslint-disable-next-line no-control-regex
   return text.replace(/[\u0000-\u001F\u007F-\u009F\u061C\u200E\u200F\u202A-\u202E\u2066-\u2069]/g, "");
 }
 
@@ -208,12 +210,7 @@ export function buildVerifyUrl(base: string, payload: VerifyPayload): string {
  * Split items into groups whose URLs stay under `maxUrlLength`, so each QR
  * code stays small enough to scan from a printed page (and photocopies).
  */
-export function chunkForQr(
-  base: string,
-  caseRef: string,
-  items: readonly VerifyItem[],
-  maxUrlLength = 700,
-): VerifyItem[][] {
+export function chunkForQr(base: string, caseRef: string, items: readonly VerifyItem[], maxUrlLength = 700): VerifyItem[][] {
   const groups: VerifyItem[][] = [];
   let current: VerifyItem[] = [];
   for (const item of items) {

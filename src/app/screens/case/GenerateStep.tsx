@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { buildVerifyUrl, chunkForQr } from "../../../engine/verify/verify-link";
 import { checkCase, hasBlockingIssues } from "../../../sakshya/certificate/checks";
 import { verifyItems } from "../../../sakshya/certificate/verify-items";
+import { hashCsv, sha256sums } from "../../../sakshya/certificate/hash-list";
 import type { ExpertDraft } from "../../../sakshya/model";
 import { announce } from "../../components/Announcer";
 import { Check, Notice, Progress, SelectField, Stamp, TextField } from "../../components/ui";
@@ -79,7 +80,8 @@ export function GenerateStep({ handle, caseFile: c }: StepProps) {
   }, []);
 
   const setExpert = (patch: Partial<ExpertDraft>) => handle.set((cur) => touch(cur, { expert: { ...cur.expert, ...patch } }));
-  const setAlg = (key: "sha256" | "sha1" | "md5", v: boolean) => handle.set((cur) => touch(cur, { algorithms: { ...cur.algorithms, [key]: v } }));
+  const setAlg = (key: "sha256" | "sha1" | "md5", v: boolean) =>
+    handle.set((cur) => touch(cur, { algorithms: { ...cur.algorithms, [key]: v } }));
 
   const run = async (label: string, task: () => Promise<string>) => {
     setBusy(label);
@@ -136,11 +138,10 @@ export function GenerateStep({ handle, caseFile: c }: StepProps) {
   const makeTranscript = (recordId: string) =>
     run(`transcript-${recordId}`, async () => {
       const range = ranges[recordId] ?? { from: "", to: "", order: "" };
-      const pdf = await (await pdfServices()).generateTranscript(
-        c,
-        recordId,
-        { from: range.from, to: range.to, dateOrder: range.order || undefined },
-        (doneCount, total) => setTranscriptProgress({ done: doneCount, total }),
+      const pdf = await (
+        await pdfServices()
+      ).generateTranscript(c, recordId, { from: range.from, to: range.to, dateOrder: range.order || undefined }, (doneCount, total) =>
+        setTranscriptProgress({ done: doneCount, total }),
       );
       downloadBytes(pdf.bytes, pdf.fileName);
       const rec = c.records.find((r) => r.id === recordId);
@@ -148,7 +149,8 @@ export function GenerateStep({ handle, caseFile: c }: StepProps) {
         withEvent(cur, {
           action: "transcript-generated",
           actor,
-          summary: `Generated WhatsApp transcript of ${rec?.label ?? ""} ${range.from || range.to ? `(${range.from || "start"} to ${range.to || "end"})` : ""}`.trim(),
+          summary:
+            `Generated WhatsApp transcript of ${rec?.label ?? ""} ${range.from || range.to ? `(${range.from || "start"} to ${range.to || "end"})` : ""}`.trim(),
           details: { sha256: pdf.sha256, bytes: pdf.bytes.length },
         }),
       );
@@ -159,13 +161,32 @@ export function GenerateStep({ handle, caseFile: c }: StepProps) {
     run("backup", async () => {
       const bytes = await exportBackup(c);
       downloadBytes(bytes, `${(c.caseNumber || c.title || "case").replace(/[^\w.-]+/g, "_")}.sakshya-backup.json`, "application/json");
-      await handle.update((cur) => withEvent(cur, { action: "bundle-exported", actor, summary: "Downloaded a case backup (JSON)", details: { bytes: bytes.length } }));
+      await handle.update((cur) =>
+        withEvent(cur, { action: "bundle-exported", actor, summary: "Downloaded a case backup (JSON)", details: { bytes: bytes.length } }),
+      );
       return "Downloaded the case backup.";
+    });
+
+  const fileStem = (c.caseNumber || c.title || "case").replace(/[^\w.-]+/g, "_");
+  const makeHashLists = () =>
+    run("hash-lists", async () => {
+      downloadBytes(new TextEncoder().encode(sha256sums(c)), `${fileStem}.SHA256SUMS`, "text/plain");
+      downloadBytes(new TextEncoder().encode(hashCsv(c)), `${fileStem} hash report.csv`, "text/csv");
+      await handle.update((cur) =>
+        withEvent(cur, {
+          action: "bundle-exported",
+          actor,
+          summary: "Downloaded hash lists (SHA256SUMS and CSV)",
+          details: { records: cur.records.filter((r) => r.includeInCertificate).length },
+        }),
+      );
+      return "Downloaded the SHA256SUMS file and the CSV hash report.";
     });
 
   const chats = c.records.filter((r) => r.kind === "chat-text");
   const qrGroups = useMemo(
-    () => chunkForQr(verifyUrl, c.caseNumber || c.title || "Case", verifyItems(c.records.filter((r) => r.includeInCertificate && r.deviceId))),
+    () =>
+      chunkForQr(verifyUrl, c.caseNumber || c.title || "Case", verifyItems(c.records.filter((r) => r.includeInCertificate && r.deviceId))),
     [verifyUrl, c],
   );
   const firstQr = qrGroups[0] ? buildVerifyUrl(verifyUrl, { caseRef: c.caseNumber || c.title || "Case", items: qrGroups[0] }) : null;
@@ -178,7 +199,9 @@ export function GenerateStep({ handle, caseFile: c }: StepProps) {
 
       <h2>Before you generate</h2>
       {issues.length === 0 ? (
-        <Notice tone="ok">This checker found nothing missing. That does not mean the certificate is correct: have your advocate review it.</Notice>
+        <Notice tone="ok">
+          This checker found nothing missing. That does not mean the certificate is correct: have your advocate review it.
+        </Notice>
       ) : (
         <ul className="issues">
           {issues.map((i, n) => (
@@ -205,8 +228,8 @@ export function GenerateStep({ handle, caseFile: c }: StepProps) {
           <strong>Expert's details for the Part B draft (optional)</strong>
         </summary>
         <p className="small">
-          Fill this only if you already know who will examine the records. Otherwise the draft leaves blanks for the expert. Who may sign Part
-          B is still an open question of law; ask your advocate.
+          Fill this only if you already know who will examine the records. Otherwise the draft leaves blanks for the expert. Who may sign
+          Part B is still an open question of law; ask your advocate.
         </p>
         <TextField label="Expert's name" value={c.expert.name} onChange={(v) => setExpert({ name: v })} />
         <div className="row">
@@ -235,7 +258,10 @@ export function GenerateStep({ handle, caseFile: c }: StepProps) {
             ? { severity: "error", text: "Enter a web address starting with https://" }
             : isPublicUrl(verifyUrl)
               ? null
-              : { severity: "warning", text: "Other people's phones can only open this if it is a public https:// address where Sakshya Kit is hosted." }
+              : {
+                  severity: "warning",
+                  text: "Other people's phones can only open this if it is a public https:// address where Sakshya Kit is hosted.",
+                }
         }
       />
       <Check label="Include a blank Part B for the expert to fill by hand" checked={blankPartB} onChange={setBlankPartB} />
@@ -261,12 +287,14 @@ export function GenerateStep({ handle, caseFile: c }: StepProps) {
         <Notice title="Optional: add an RFC 3161 timestamp">
           <p>
             A Time Stamping Authority (TSA) can sign the PDF's hash together with the current time, as evidence that this exact document
-            existed by then. This uses the internet for a moment: only the PDF's hash is sent, never the PDF, but the service will see your IP
-            address and the time. It is a free third-party service ({new URL(DEFAULT_TSA_URL).host}), not a government or accredited one;
+            existed by then. This uses the internet for a moment: only the PDF's hash is sent, never the PDF, but the service will see your
+            IP address and the time. It is a free third-party service ({new URL(DEFAULT_TSA_URL).host}), not a government or accredited one;
             ask your advocate whether a timestamp helps in your case.
           </p>
           <button type="button" className="btn secondary" disabled={busy !== null} onClick={() => void addTimestamp()}>
-            {busy === "timestamp" ? "Contacting the timestamp service…" : `Send the PDF's hash to ${new URL(DEFAULT_TSA_URL).host} for a timestamp`}
+            {busy === "timestamp"
+              ? "Contacting the timestamp service…"
+              : `Send the PDF's hash to ${new URL(DEFAULT_TSA_URL).host} for a timestamp`}
           </button>
         </Notice>
       )}
@@ -310,10 +338,19 @@ export function GenerateStep({ handle, caseFile: c }: StepProps) {
         </>
       )}
 
+      <h2>Hash lists for experts</h2>
+      <p className="small">
+        A <code>SHA256SUMS</code> file lets an expert check every file in one command (<code>sha256sum -c</code>), and a CSV opens in any
+        spreadsheet. Both list the records included on the certificate.
+      </p>
+      <button type="button" className="btn secondary" disabled={busy !== null} onClick={() => void makeHashLists()}>
+        Download hash lists
+      </button>
+
       <h2>Backup</h2>
       <p className="small">
-        Cases live only in this browser. Download a backup to keep the case details, hashes, custody log and chat text safe or to move them to
-        another device. Your media files are not inside the backup; keep the originals.
+        Cases live only in this browser. Download a backup to keep the case details, hashes, custody log and chat text safe or to move them
+        to another device. Your media files are not inside the backup; keep the originals.
       </p>
       <button type="button" className="btn secondary" disabled={busy !== null} onClick={() => void makeBackup()}>
         Download case backup

@@ -76,7 +76,9 @@ function messageRow(m: ChatMessage, opts: TranscriptOptions): Row {
     size: 5.6,
   });
 
-  const sender: Span[] = m.author ? [{ text: m.author, style: "sansBold" }] : [{ text: m.kind === "system" ? "(system)" : "-", color: MUTED }];
+  const sender: Span[] = m.author
+    ? [{ text: m.author, style: "sansBold" }]
+    : [{ text: m.kind === "system" ? "(system)" : "-", color: MUTED }];
   return [
     [{ spans: [{ text: String(m.index) }], size: 7.4 }],
     [
@@ -119,8 +121,18 @@ async function summary(w: PdfWriter, opts: TranscriptOptions, shown: readonly Ch
     ],
     ["Period covered", [{ text: first && last ? `${first.replace("T", " ")} to ${last.replace("T", " ")} (phone's local time)` : "-" }]],
     ["Participants", [{ text: chat.participants.map((p) => `${p.name} (${p.count})`).join(", ") || "-" }]],
-    ["Date order used", [{ text: `${chat.dateOrder === "DMY" ? "day/month/year" : chat.dateOrder === "MDY" ? "month/day/year" : "year/month/day"}: ${chat.dateOrderReason}` }]],
-    ["Message boundaries", [{ text: chat.boundaryMethod === "crlf-records" ? "exact (iOS record terminators)" : "by date/time header lines (see limitations)" }]],
+    [
+      "Date order used",
+      [
+        {
+          text: `${chat.dateOrder === "DMY" ? "day/month/year" : chat.dateOrder === "MDY" ? "month/day/year" : "year/month/day"}: ${chat.dateOrderReason}`,
+        },
+      ],
+    ],
+    [
+      "Message boundaries",
+      [{ text: chat.boundaryMethod === "crlf-records" ? "exact (iOS record terminators)" : "by date/time header lines (see limitations)" }],
+    ],
     ["Generated", [{ text: `${istStamp(opts.generatedAt)} with Sakshya Kit ${opts.appVersion}` }]],
   ];
   await w.table(
@@ -144,14 +156,22 @@ async function summary(w: PdfWriter, opts: TranscriptOptions, shown: readonly Ch
             : "") +
           ". To check one message, hash that slice of the original chat file, for example: ",
       },
-      { text: "python -c \"import hashlib;b=open('_chat.txt','rb').read();print(hashlib.sha256(b[START:END]).hexdigest())\"", style: "mono" },
+      {
+        text: "python -c \"import hashlib;b=open('_chat.txt','rb').read();print(hashlib.sha256(b[START:END]).hexdigest())\"",
+        style: "mono",
+      },
     ],
     8,
   );
   await w.paragraph([{ text: "Limitations", style: "sansBold" }], 9.5, { after: 2 });
   for (const l of [...chat.limitations, ...chat.warnings]) await w.paragraph([{ text: `•  ${l}` }], 7.8, { indent: 4, after: 2 });
   await w.paragraph(
-    [{ text: "Characters that cannot be printed (such as emoji) are shown as their Unicode code point, e.g. [U+1F44D]. Hashes always cover the original characters.", color: MUTED }],
+    [
+      {
+        text: "Characters that cannot be printed (such as emoji) are shown as their Unicode code point, e.g. [U+1F44D]. Hashes always cover the original characters.",
+        color: MUTED,
+      },
+    ],
     7.4,
   );
   w.spacer(4);

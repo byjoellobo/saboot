@@ -89,7 +89,9 @@ export async function importBackup(file: File): Promise<CaseFile> {
     if (!record || !newRecordId) continue;
     const bytes = fromBase64(ch.base64);
     if (bytes.length !== record.size || (await sha256Hex(bytes)) !== record.hashes.sha256) {
-      throw new Error(`The chat text for ${record.label} in this backup does not match its recorded SHA-256, so the backup was not imported.`);
+      throw new Error(
+        `The chat text for ${record.label} in this backup does not match its recorded SHA-256, so the backup was not imported.`,
+      );
     }
     chats.push({ recordId: newRecordId, bytes });
   }

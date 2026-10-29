@@ -55,11 +55,7 @@ export async function hashEvent(e: Omit<CustodyEvent, "hash">): Promise<string> 
 }
 
 /** Returns a NEW log with the event appended; the input is not modified. */
-export async function appendEvent(
-  log: readonly CustodyEvent[],
-  input: NewCustodyEvent,
-  now: Date = new Date(),
-): Promise<CustodyEvent[]> {
+export async function appendEvent(log: readonly CustodyEvent[], input: NewCustodyEvent, now: Date = new Date()): Promise<CustodyEvent[]> {
   const prev = log[log.length - 1];
   const draft = {
     seq: (prev?.seq ?? 0) + 1,
@@ -87,7 +83,8 @@ export async function verifyChain(log: readonly CustodyEvent[]): Promise<ChainCh
     if (e.seq !== i + 1) return { ok: false, brokenAt: e.seq, reason: "Sequence numbers are not continuous" };
     if (e.prevHash !== prevHash) return { ok: false, brokenAt: e.seq, reason: "Link to the previous entry does not match" };
     const { hash, ...rest } = e;
-    if ((await hashEvent(rest)) !== hash) return { ok: false, brokenAt: e.seq, reason: "Entry contents were changed after it was recorded" };
+    if ((await hashEvent(rest)) !== hash)
+      return { ok: false, brokenAt: e.seq, reason: "Entry contents were changed after it was recorded" };
     prevHash = hash;
   }
   return { ok: true, brokenAt: null, reason: null };

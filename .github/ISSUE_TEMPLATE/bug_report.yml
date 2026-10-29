@@ -1,0 +1,97 @@
+name: Bug report
+description: Something in Sakshya Kit does not work as it should.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a problem.
+
+        **Do not include personal data.** Issues are public. Never paste or attach real chats, evidence files, screenshots that show real people, phone numbers, IMEIs, serial numbers, MAC addresses, names, addresses or case details. If you need to show a file, make a small test file yourself.
+
+        If the problem could expose someone's data or make Sakshya Kit show a wrong hash, please report it privately instead, as explained in the [security policy](https://github.com/mezpos/sakshya-kit/security/policy).
+
+        We cannot give legal advice about your case.
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Personal data
+      options:
+        - label: "I have removed all personal data: no real chats, phone numbers, IMEIs, names or case details"
+          required: true
+  - type: input
+    id: version
+    attributes:
+      label: Sakshya Kit version
+      description: Shown at the bottom of the app, for example "Sakshya Kit 0.1.0".
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Where did it happen?
+      options:
+        - Adding files or hashing
+        - WhatsApp chat or transcript
+        - Recording a device or a device guide
+        - Generating the certificate PDF
+        - Check page (verify.html or a QR code)
+        - Custody log
+        - Backup or restore
+        - Offline use or installing the app
+        - Something else
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Device type
+      options:
+        - Android phone or tablet
+        - iPhone or iPad
+        - Windows computer
+        - Mac
+        - Linux computer
+        - Chromebook
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and version
+      placeholder: "Chrome 141 on Android 15"
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Include any error message exactly as shown.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to happen?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Use test files you made yourself. Describe them (type, size, how you made them) or attach them if they contain no personal data.
+      placeholder: |
+        1. Start a new case
+        2. Add a test photo of about 5 MB
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: console
+    attributes:
+      label: Browser console output (optional)
+      description: If you know how, copy any red errors from the browser's developer console. Check that they contain no personal data first.
+      render: text

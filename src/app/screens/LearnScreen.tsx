@@ -1,4 +1,37 @@
+import { useState } from "react";
 import { SECTION_63_4 } from "../../sakshya/certificate/schedule";
+import { Notice } from "../components/ui";
+import { deleteAllData } from "../state/db";
+import { PRIVACY_URL } from "../links";
+
+function DeleteAllData() {
+  const [status, setStatus] = useState<{ tone: "ok" | "warn"; text: string } | null>(null);
+  return (
+    <>
+      <div className="actions">
+        <button
+          type="button"
+          className="btn danger"
+          onClick={async () => {
+            const sure = window.confirm(
+              "Delete every case, hash value, custody log and chat text stored by Sakshya Kit in this browser? This cannot be undone. Download backups first if you need them. Your original files are not affected.",
+            );
+            if (!sure) return;
+            try {
+              await deleteAllData();
+              setStatus({ tone: "ok", text: "All Sakshya Kit data on this device has been deleted." });
+            } catch (e) {
+              setStatus({ tone: "warn", text: e instanceof Error ? e.message : "Could not delete the data." });
+            }
+          }}
+        >
+          Delete all data on this device
+        </button>
+      </div>
+      {status && <Notice tone={status.tone}>{status.text}</Notice>}
+    </>
+  );
+}
 
 const SOURCES = [
   {
@@ -10,7 +43,7 @@ const SOURCES = [
     url: "https://www.livelaw.in/pdf_upload/2026/05/27/pune-bar-association-v-union-of-india-676590.pdf",
   },
   {
-    label: "Samarth Saxena, \"How Bharatiya Sakshya Adhiniyam Has Transformed Digital Evidence\", LiveLaw, 2 October 2026",
+    label: 'Samarth Saxena, "How Bharatiya Sakshya Adhiniyam Has Transformed Digital Evidence", LiveLaw, 2 October 2026',
     url: "https://www.livelaw.in/articles/bharatiya-sakshya-adhiniyam-transformed-digital-evidence-552681",
   },
 ];
@@ -21,21 +54,21 @@ export function LearnScreen() {
       <section className="sheet">
         <h1>About the section 63 certificate</h1>
         <p className="lede">
-          A plain-language summary of the rule this tool helps with, what is settled, and what is not. It is not legal advice; ask an advocate
-          about your case.
+          A plain-language summary of the rule this tool helps with, what is settled, and what is not. It is not legal advice; ask an
+          advocate about your case.
         </p>
 
         <h2>What the law asks for</h2>
         <p>
-          Under section 63(4) of the Bharatiya Sakshya Adhiniyam, 2023, a certificate "shall be submitted along with the electronic record at
-          each instance where it is being submitted for admission". The form of the certificate is set out in the Schedule to the Act. It has
-          two parts:
+          Under section 63(4) of the Bharatiya Sakshya Adhiniyam, 2023, a certificate "shall be submitted along with the electronic record
+          at each instance where it is being submitted for admission". The form of the certificate is set out in the Schedule to the Act. It
+          has two parts:
         </p>
         <ul>
           <li>
-            <strong>Part A, filled by the party:</strong> who you are, which device or source the record came from (tick box, make and model,
-            colour, serial number, IMEI/UIN/UID/MAC/Cloud ID), a statement that the device was under lawful control and working properly,
-            whether you own, maintain, manage or operate it, and the hash value of each record.
+            <strong>Part A, filled by the party:</strong> who you are, which device or source the record came from (tick box, make and
+            model, colour, serial number, IMEI/UIN/UID/MAC/Cloud ID), a statement that the device was under lawful control and working
+            properly, whether you own, maintain, manage or operate it, and the hash value of each record.
           </li>
           <li>
             <strong>Part B, filled by an expert:</strong> the same device details and hash values, stated by the expert, with their name,
@@ -44,8 +77,8 @@ export function LearnScreen() {
         </ul>
         <p>
           Both parts carry the hash block ("I state that the HASH value/s of the electronic/digital record/s is ___", with boxes for SHA1,
-          SHA256, MD5 or Other) and the note "(Hash report to be enclosed with the certificate)". Both are signed with the date and the time in
-          IST, 24-hour format.
+          SHA256, MD5 or Other) and the note "(Hash report to be enclosed with the certificate)". Both are signed with the date and the time
+          in IST, 24-hour format.
         </p>
         <details>
           <summary>Read section 63(4)</summary>
@@ -56,25 +89,25 @@ export function LearnScreen() {
 
         <h2>What a hash value is</h2>
         <p>
-          A hash is a short code calculated from every bit of a file. If even one bit changes, the hash changes completely, so two files with the
-          same SHA-256 value are, in practice, the same file. In Pune Bar Association v. Union of India (22 May 2026) the Supreme Court said:
-          "Hash value of an electronic data is synonymous with an electronic fingerprint and provides a sure way of identifying and verifying
-          digital data." The Court also noted that challenges to electronic records "are further accentuated with the advent of artificial
-          intelligence and deepfake technology".
+          A hash is a short code calculated from every bit of a file. If even one bit changes, the hash changes completely, so two files
+          with the same SHA-256 value are, in practice, the same file. In Pune Bar Association v. Union of India (22 May 2026) the Supreme
+          Court said: "Hash value of an electronic data is synonymous with an electronic fingerprint and provides a sure way of identifying
+          and verifying digital data." The Court also noted that challenges to electronic records "are further accentuated with the advent
+          of artificial intelligence and deepfake technology".
         </p>
 
         <h2>What is not settled</h2>
         <ul>
           <li>
             <strong>Who may sign Part B.</strong> The Supreme Court kept this question of law open. It observed that, besides an Examiner of
-            Electronic Evidence notified under section 79A of the Information Technology Act, 2000, it is possible that another person may sign
-            if the court is satisfied, on unimpeachable material, that they have special skill and expertise in computer science and cyber
-            forensics.
+            Electronic Evidence notified under section 79A of the Information Technology Act, 2000, it is possible that another person may
+            sign if the court is satisfied, on unimpeachable material, that they have special skill and expertise in computer science and
+            cyber forensics.
           </li>
           <li>
-            <strong>Whether a certificate is needed when the original device itself is produced.</strong> Under the old law the Supreme Court
-            had said it was not (Arjun Panditrao Khotkar, 2020). Some commentators argue that exception no longer survives under section 63;
-            at least one High Court has continued to apply it. Ask your advocate.
+            <strong>Whether a certificate is needed when the original device itself is produced.</strong> Under the old law the Supreme
+            Court had said it was not (Arjun Panditrao Khotkar, 2020). Some commentators argue that exception no longer survives under
+            section 63; at least one High Court has continued to apply it. Ask your advocate.
           </li>
           <li>
             <strong>Whether a missing certificate can be filed later.</strong> Courts have allowed extra time in some cases, but there is no
@@ -94,13 +127,30 @@ export function LearnScreen() {
           <li>It turns a WhatsApp export into a page-numbered transcript where every message has its own hash and byte position.</li>
           <li>It keeps a custody log in which each entry is chained to the one before it.</li>
           <li>
-            It is <strong>not</strong> a lawyer and <strong>not</strong> the expert. It cannot tell whether a record is genuine, and it cannot
-            make an inadmissible record admissible.
+            It is <strong>not</strong> a lawyer and <strong>not</strong> the expert. It cannot tell whether a record is genuine, and it
+            cannot make an inadmissible record admissible.
           </li>
         </ul>
         <p>
-          The only time it uses the internet is when you choose to add a trusted timestamp to a generated PDF; then only the PDF's hash is sent.
+          The only time it uses the internet is when you choose to add a trusted timestamp to a generated PDF; then only the PDF's hash is
+          sent.
         </p>
+
+        <h2>Your data on this device</h2>
+        <p>
+          Cases are stored only in this browser, on this device: case details, hash values, device identifiers, the custody log and WhatsApp
+          chat text. Photos, recordings and videos are never stored, only their hash values. There are no accounts, no analytics and no
+          cookies. See the{" "}
+          <a href={PRIVACY_URL} target="_blank" rel="noreferrer noopener">
+            privacy statement
+          </a>
+          .
+        </p>
+        <p>
+          To use Sakshya Kit without internet, install it: on Android or a computer, use "Install app" at the top (or the browser menu); on
+          an iPhone, open it in Safari and choose Share, then Add to Home Screen.
+        </p>
+        <DeleteAllData />
 
         <h2>Sources</h2>
         <ul>

@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { HashCancelled, sharedPool, type JobProgress } from "../../engine/hash/hash-pool";
 import type { EvidenceRecord } from "../../sakshya/model";
 import { announce } from "../components/Announcer";
@@ -25,11 +25,19 @@ export interface IngestState {
   clearErrors: () => void;
 }
 
+/** Files waiting to be added when a case opens (used by the demo case). */
+const pending = new Map<string, File[]>();
+
+export function queueFilesForCase(caseId: string, files: File[]): void {
+  pending.set(caseId, [...(pending.get(caseId) ?? []), ...files]);
+}
+
 /**
  * Hashing state for one open case. It lives in CaseScreen, so moving between
  * steps while large files hash does not lose progress, warnings or errors.
  */
 export function useIngest(caseId: string, handle: CaseHandle): IngestState {
+  const { update } = handle;
   const [jobs, setJobs] = useState<IngestJob[]>([]);
   const [warnings, setWarnings] = useState<string[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
@@ -49,13 +57,14 @@ export function useIngest(caseId: string, handle: CaseHandle): IngestState {
             // Store chat text first: a record must never exist without its text.
             for (const ch of out.chats) await saveChatBytes(caseId, ch.recordId, ch.bytes);
             let labelled: EvidenceRecord[] = [];
-            const saved = await handle.update(async (cur) => {
+            const saved = await update(async (cur) => {
               const { labels, nextLabel } = nextLabels(cur, out.records.length);
               const onlyDevice = cur.devices.length === 1 ? (cur.devices[0]?.id ?? null) : null;
               labelled = out.records.map((r, i) => ({ ...r, label: labels[i] ?? r.label, deviceId: r.deviceId ?? onlyDevice }));
               const actor = cur.party.name.trim() || "Case owner";
               let next = touch(cur, { records: [...cur.records, ...labelled], nextLabel });
-              for (const e of out.events) next = await withEvent(next, { ...e, actor, summary: `${labelled[0]?.label ?? ""}: ${e.summary}` });
+              for (const e of out.events)
+                next = await withEvent(next, { ...e, actor, summary: `${labelled[0]?.label ?? ""}: ${e.summary}` });
               return next;
             });
             if (!saved) {
@@ -75,8 +84,16 @@ export function useIngest(caseId: string, handle: CaseHandle): IngestState {
           .finally(() => setJobs((js) => js.filter((j) => j.key !== key)));
       }
     },
-    [caseId, handle],
+    [caseId, update],
   );
+
+  useEffect(() => {
+    if (!handle.caseFile) return;
+    const files = pending.get(caseId);
+    if (!files) return;
+    pending.delete(caseId);
+    addFiles(files);
+  }, [caseId, handle.caseFile, addFiles]);
 
   return {
     jobs,

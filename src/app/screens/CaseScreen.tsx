@@ -25,10 +25,15 @@ export function CaseScreen({ id, step }: { id: string; step: Step }) {
   const { caseFile, loading, error, saveError } = handle;
   const stepTitle = TABS.find((t) => t.step === step)?.title ?? "";
 
-  // Tell assistive technology where we are after each step change.
+  const caseName = caseFile ? caseDisplayName(caseFile) : "";
+
   useEffect(() => {
-    if (!caseFile) return;
-    document.title = `${stepTitle}: ${caseDisplayName(caseFile)} (Sakshya Kit)`;
+    if (caseName) document.title = `${stepTitle}: ${caseName} (Sakshya Kit)`;
+  }, [stepTitle, caseName]);
+
+  // Move focus to the step heading only when the step changes (never while typing).
+  useEffect(() => {
+    if (loading) return;
     document.getElementById("step-title")?.focus({ preventScroll: true });
     document.querySelector(".index-tab[aria-current='step']")?.scrollIntoView({ block: "nearest", inline: "center" });
   }, [step, loading]);
@@ -53,7 +58,12 @@ export function CaseScreen({ id, step }: { id: string; step: Step }) {
     <div className="case-file">
       <nav className="index-tabs" aria-label="Case steps">
         {TABS.map((t, i) => (
-          <a key={t.step} className="index-tab" href={href({ name: "case", id, step: t.step })} aria-current={t.step === step ? "step" : undefined}>
+          <a
+            key={t.step}
+            className="index-tab"
+            href={href({ name: "case", id, step: t.step })}
+            aria-current={t.step === step ? "step" : undefined}
+          >
             {t.step !== "log" && <span className="num">{i + 1}</span>}
             <span>{t.title}</span>
             {t.step === "records" && ingest.jobs.length > 0 && <span className="small">(hashing {ingest.jobs.length})</span>}

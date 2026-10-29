@@ -60,8 +60,8 @@ export function RecordsStep({ handle, caseFile: c, ingest }: StepProps & { inges
       </h1>
       <p>
         Add the exact files you will file in court. Each one is read on this device and hashed: a hash is a short code worked out from every
-        bit of the file, so any change to the file changes it. Large CCTV files can take a few minutes; you can move to other steps while they
-        hash.
+        bit of the file, so any change to the file changes it. Large CCTV files can take a few minutes; you can move to other steps while
+        they hash.
       </p>
       <Notice title="Hash the copy you will file" level={2}>
         <p>
@@ -80,8 +80,7 @@ export function RecordsStep({ handle, caseFile: c, ingest }: StepProps & { inges
       {jobs.map((j) => (
         <div key={j.key}>
           <span className="small">
-            Hashing {j.name} ({shortSize(j.size)})
-            {j.progress?.phase === "entries" ? ", now the files inside the zip" : ""}
+            Hashing {j.name} ({shortSize(j.size)}){j.progress?.phase === "entries" ? ", now the files inside the zip" : ""}
           </span>
           <Progress done={j.progress?.done ?? 0} total={j.progress?.total ?? j.size} label={`Hashing ${j.name}`} />
         </div>
@@ -124,13 +123,24 @@ export function RecordsStep({ handle, caseFile: c, ingest }: StepProps & { inges
           return (
             <li key={r.id} style={{ listStyle: "none" }}>
               <ul className="record-list">
-                <RecordItem record={r} caseFile={c} fresh={fresh.has(r.id)} onChange={(p) => change(r.id, p)} onRemove={() => void remove(r)} />
+                <RecordItem
+                  record={r}
+                  caseFile={c}
+                  fresh={fresh.has(r.id)}
+                  onChange={(p) => change(r.id, p)}
+                  onRemove={() => void remove(r)}
+                />
                 {visible.map((x) => (
                   <RecordItem key={x.id} record={x} caseFile={c} fresh={fresh.has(x.id)} child onChange={(p) => change(x.id, p)} />
                 ))}
               </ul>
               {!showAll && (
-                <button type="button" className="btn link" style={{ marginLeft: "2.5rem" }} onClick={() => setExpanded((s) => new Set([...s, r.id]))}>
+                <button
+                  type="button"
+                  className="btn link"
+                  style={{ marginLeft: "2.5rem" }}
+                  onClick={() => setExpanded((s) => new Set([...s, r.id]))}
+                >
                   Show all {children.length} files inside {r.label}
                 </button>
               )}

@@ -1,0 +1,8 @@
+# The committed WebAssembly binary is checked byte for byte in CI, and
+# different compiler versions produce different bytes. Pin the version here
+# and bump it together with a rebuilt src/engine/hash/sakshya_hash.wasm.
+[toolchain]
+channel = "1.99.1"
+targets = ["wasm32-unknown-unknown"]
+components = ["clippy", "rustfmt"]
+profile = "minimal"

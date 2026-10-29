@@ -158,7 +158,7 @@ function parseZip64Extra(
   wants: { size: boolean; compressed: boolean; offset: boolean },
 ): { size?: number; compressed?: number; offset?: number } {
   const view = new DataView(extra.buffer, extra.byteOffset, extra.byteLength);
-  for (let at = 0; at + 4 <= extra.length; ) {
+  for (let at = 0; at + 4 <= extra.length;) {
     const id = view.getUint16(at, true);
     const len = view.getUint16(at + 2, true);
     const body = at + 4;
@@ -340,11 +340,7 @@ async function hashEntry(
  * Hash every file inside a zip. Damaged or unsupported entries are reported
  * individually instead of failing the whole archive.
  */
-export async function hashZipEntries(
-  mod: HasherModule,
-  blob: BlobLike,
-  opts: ReadZipOptions = {},
-): Promise<ZipEntryResult[]> {
+export async function hashZipEntries(mod: HasherModule, blob: BlobLike, opts: ReadZipOptions = {}): Promise<ZipEntryResult[]> {
   const entries = await listZip(blob);
   const total = entries.reduce((sum, e) => sum + (e.isDirectory ? 0 : e.compressedSize), 0);
   let done = 0;

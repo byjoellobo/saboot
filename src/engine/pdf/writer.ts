@@ -180,7 +180,8 @@ export class PdfWriter {
 
   // ---------------------------------------------------------------- layout
 
-  private static segmenter = typeof Intl !== "undefined" && "Segmenter" in Intl ? new Intl.Segmenter("en", { granularity: "grapheme" }) : null;
+  private static segmenter =
+    typeof Intl !== "undefined" && "Segmenter" in Intl ? new Intl.Segmenter("en", { granularity: "grapheme" }) : null;
 
   private graphemes(text: string): string[] {
     const seg = PdfWriter.segmenter;
@@ -254,7 +255,11 @@ export class PdfWriter {
   }
 
   /** Flowing paragraph across the full width (or an indented width). */
-  async paragraph(spans: readonly Span[], size = 10, opts: { indent?: number; align?: Block["align"]; after?: number } = {}): Promise<void> {
+  async paragraph(
+    spans: readonly Span[],
+    size = 10,
+    opts: { indent?: number; align?: Block["align"]; after?: number } = {},
+  ): Promise<void> {
     await this.prepare(spans);
     const indent = opts.indent ?? 0;
     const lines = this.layout({ spans, size, align: opts.align }, this.width - indent);
@@ -298,8 +303,18 @@ export class PdfWriter {
     this.page.drawRectangle({ x, y, width: size, height: size, borderColor: INK, borderWidth: 0.8 });
     if (checked) {
       // A drawn tick mark, so it does not depend on any font having U+2713.
-      this.page.drawLine({ start: { x: x + size * 0.18, y: y + size * 0.52 }, end: { x: x + size * 0.42, y: y + size * 0.2 }, thickness: 1.4, color: FILL });
-      this.page.drawLine({ start: { x: x + size * 0.42, y: y + size * 0.2 }, end: { x: x + size * 0.86, y: y + size * 0.86 }, thickness: 1.4, color: FILL });
+      this.page.drawLine({
+        start: { x: x + size * 0.18, y: y + size * 0.52 },
+        end: { x: x + size * 0.42, y: y + size * 0.2 },
+        thickness: 1.4,
+        color: FILL,
+      });
+      this.page.drawLine({
+        start: { x: x + size * 0.42, y: y + size * 0.2 },
+        end: { x: x + size * 0.86, y: y + size * 0.86 },
+        thickness: 1.4,
+        color: FILL,
+      });
     }
   }
 
@@ -318,14 +333,22 @@ export class PdfWriter {
     await this.prepare(columns.map((c) => ({ text: c.header, style: "sansBold" })));
     for (const row of rows) for (const cell of row) for (const b of cell) await this.prepare(b.spans);
 
-    const headerLines = columns.map((c, i) => this.layout({ spans: [{ text: c.header, style: "sansBold" }], size: headerSize }, (widths[i] ?? 0) - pad * 2));
+    const headerLines = columns.map((c, i) =>
+      this.layout({ spans: [{ text: c.header, style: "sansBold" }], size: headerSize }, (widths[i] ?? 0) - pad * 2),
+    );
     const headerHeight = Math.max(...headerLines.map((ls) => ls.reduce((s, l) => s + l.height, 0))) + pad * 2;
     const pageRoom = A4[1] - this.margin.top - this.margin.bottom - headerHeight - pad * 2;
 
     const drawHeader = () => {
       this.ensure(headerHeight + 20);
       const top = this.y;
-      this.page.drawRectangle({ x: this.margin.left, y: top - headerHeight, width: this.width, height: headerHeight, color: rgb(0.92, 0.93, 0.96) });
+      this.page.drawRectangle({
+        x: this.margin.left,
+        y: top - headerHeight,
+        width: this.width,
+        height: headerHeight,
+        color: rgb(0.92, 0.93, 0.96),
+      });
       let x = this.margin.left;
       headerLines.forEach((ls, i) => {
         let y = top - pad;
@@ -373,7 +396,13 @@ export class PdfWriter {
         const rowHeight = Math.max(...taken.map((t) => t.height)) + pad * 2;
         const top = this.y;
         if (opts.zebra && rowIndex % 2 === 1) {
-          this.page.drawRectangle({ x: this.margin.left, y: top - rowHeight, width: this.width, height: rowHeight, color: rgb(0.975, 0.975, 0.985) });
+          this.page.drawRectangle({
+            x: this.margin.left,
+            y: top - rowHeight,
+            width: this.width,
+            height: rowHeight,
+            color: rgb(0.975, 0.975, 0.985),
+          });
         }
         let x = this.margin.left;
         taken.forEach((t, i) => {
@@ -384,7 +413,12 @@ export class PdfWriter {
           }
           x += widths[i] ?? 0;
         });
-        this.page.drawLine({ start: { x: this.margin.left, y: top - rowHeight }, end: { x: A4[0] - this.margin.right, y: top - rowHeight }, thickness: 0.4, color: RULE });
+        this.page.drawLine({
+          start: { x: this.margin.left, y: top - rowHeight },
+          end: { x: A4[0] - this.margin.right, y: top - rowHeight },
+          thickness: 0.4,
+          color: RULE,
+        });
         this.y = top - rowHeight;
         onFreshPage = false;
         if (queues.some((q) => q.length > 0)) {
@@ -433,16 +467,35 @@ export class PdfWriter {
    * banner at the top, so every page of a draft says it is a draft.
    */
   async markPages(from: number, to: number, watermark: string, banner: string): Promise<void> {
-    await this.prepare([{ text: watermark, style: "sansBold" }, { text: banner, style: "sansBold" }]);
+    await this.prepare([
+      { text: watermark, style: "sansBold" },
+      { text: banner, style: "sansBold" },
+    ]);
     const pages = this.doc.getPages().slice(from, to + 1);
     for (const page of pages) {
-      page.drawText(watermark, { x: 120, y: 230, size: 46, font: this.font("sansBold"), color: rgb(0.75, 0.1, 0.1), opacity: 0.08, rotate: degrees(38) });
+      page.drawText(watermark, {
+        x: 120,
+        y: 230,
+        size: 46,
+        font: this.font("sansBold"),
+        color: rgb(0.75, 0.1, 0.1),
+        opacity: 0.08,
+        rotate: degrees(38),
+      });
       page.drawText(banner, { x: this.margin.left, y: A4[1] - 30, size: 7.5, font: this.font("sansBold"), color: WARN });
     }
   }
 
   /** Text at an absolute position (single line, no wrap). */
-  async textAt(text: string, x: number, y: number, size: number, style: BaseStyle = "sans", color: RGB = INK, page: PDFPage = this.page): Promise<number> {
+  async textAt(
+    text: string,
+    x: number,
+    y: number,
+    size: number,
+    style: BaseStyle = "sans",
+    color: RGB = INK,
+    page: PDFPage = this.page,
+  ): Promise<number> {
     await this.prepare([{ text, style }]);
     const [line] = this.layout({ spans: [{ text, style, color }], size }, 10_000);
     if (line) this.drawLine(line, x, line.width, y, page);
@@ -487,7 +540,8 @@ function trimTrailing(runs: readonly LaidRun[], measure: (r: Run) => number): { 
   const last = out[out.length - 1];
   if (last) {
     const trimmed = last.text.replace(/\s+$/, "");
-    if (trimmed.length !== last.text.length) out[out.length - 1] = { ...last, text: trimmed, width: measure({ text: trimmed, font: last.font }) };
+    if (trimmed.length !== last.text.length)
+      out[out.length - 1] = { ...last, text: trimmed, width: measure({ text: trimmed, font: last.font }) };
   }
   return { runs: out, width: out.reduce((s, r) => s + r.width, 0) };
 }

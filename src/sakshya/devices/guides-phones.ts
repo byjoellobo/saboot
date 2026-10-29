@@ -322,8 +322,7 @@ export const ANDROID_GUIDE: DeviceGuide = {
     CAUTION_LUHN,
     CAUTION_OPERATOR_DIGITS,
     CAUTION_BOTH_VALUES_PHONE,
-    "Write Make & Model as the brand, the model name and (if shown) the model number, for example " +
-      "'Samsung Galaxy A55 (SM-A556E)'.",
+    "Write Make & Model as the brand, the model name and (if shown) the model number, for example " + "'Samsung Galaxy A55 (SM-A556E)'.",
     "If the WhatsApp number was changed, the number used at the time of the chats may differ from today's. Write " +
       "the number that was used then. Put any WhatsApp username under 'other relevant information', because " +
       "usernames can be changed.",
@@ -431,8 +430,7 @@ export const IPHONE_GUIDE: DeviceGuide = {
         },
         {
           text:
-            "Phone not set up, or stuck at the Hello screen: tap the (i) button in the bottom-right corner to see " +
-            "its identifiers.",
+            "Phone not set up, or stuck at the Hello screen: tap the (i) button in the bottom-right corner to see " + "its identifiers.",
           confidence: "official",
         },
         {
@@ -560,8 +558,7 @@ export const IPHONE_GUIDE: DeviceGuide = {
       "disagree on which models have a printed IMEI, so treat the Settings screen as the source of truth.",
     CAUTION_OPERATOR_DIGITS,
     CAUTION_BOTH_VALUES_PHONE,
-    "Your Apple Account sign-in email may differ from your @icloud.com mail address. Write the one shown under " +
-      "Sign-In & Security.",
+    "Your Apple Account sign-in email may differ from your @icloud.com mail address. Write the one shown under " + "Sign-In & Security.",
     "If the WhatsApp number was changed, the number used at the time of the chats may differ from today's. Write " +
       "the number that was used then.",
     CAUTION_NO_SECRETS,

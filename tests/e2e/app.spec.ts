@@ -85,7 +85,11 @@ test("hash files, record a device and generate the certificate and transcript", 
   const transcriptDownload = page.waitForEvent("download");
   await page.getByRole("button", { name: "Generate transcript (PDF)" }).click();
   const transcript = await transcriptDownload;
-  expect(readFileSync(await transcript.path()).subarray(0, 5).toString()).toBe("%PDF-");
+  expect(
+    readFileSync(await transcript.path())
+      .subarray(0, 5)
+      .toString(),
+  ).toBe("%PDF-");
 
   await page.getByRole("link", { name: "Custody log" }).click();
   await expect(page.getByText(/entries link to each other correctly/)).toBeVisible();

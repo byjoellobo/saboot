@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactElement } from "react";
 import { Announcer } from "./components/Announcer";
+import { useInstallPrompt } from "./components/install";
 import { getSetting, requestPersistence, setSetting } from "./state/db";
 import { useRoute } from "./router";
 import { HomeScreen } from "./screens/HomeScreen";
@@ -19,6 +20,7 @@ export function App({ needRefresh, onRefresh, offlineReady }: AppProps): ReactEl
   const [acknowledged, setAcknowledged] = useState<boolean | null>(null);
   const [showOfflineNote, setShowOfflineNote] = useState(false);
   const [persisted, setPersisted] = useState<boolean | null>(null);
+  const install = useInstallPrompt();
 
   useEffect(() => {
     getSetting("acknowledged-v1", false).then(setAcknowledged, () => setAcknowledged(false));
@@ -48,7 +50,7 @@ export function App({ needRefresh, onRefresh, offlineReady }: AppProps): ReactEl
       <Announcer />
       <header className="topbar">
         <a className="brand" href="#/">
-          <img src="/logo.svg" alt="" width={34} height={34} />
+          <img src={`${import.meta.env.BASE_URL}logo.svg`} alt="" width={34} height={34} />
           <span>Sakshya Kit</span>
         </a>
         <nav className="topnav" aria-label="Main">
@@ -59,11 +61,16 @@ export function App({ needRefresh, onRefresh, offlineReady }: AppProps): ReactEl
             About the certificate
           </a>
           <a href="verify.html">Check a file</a>
+          {install && (
+            <button type="button" className="btn link" onClick={() => void install()}>
+              Install app
+            </button>
+          )}
         </nav>
       </header>
 
       <main className="desk" id="main" tabIndex={-1}>
-        {persisted === false && route.name !== "learn" && (
+        {persisted === false && (route.name === "home" || (route.name === "case" && route.step === "generate")) && (
           <div className="notice warn" role="note">
             This browser has not promised to keep Sakshya Kit's data, so it may clear your cases if the device runs low on space. Download a
             backup of each case from its Generate step.

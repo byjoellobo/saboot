@@ -34,7 +34,12 @@ function syntheticChat(count: number): string {
 async function build(text: string, extra: { from?: string; to?: string } = {}) {
   const bytes = new TextEncoder().encode(text);
   const chat = await hashChat(bytes, parseChat(bytes));
-  const chatFile: FileRef = { label: "R-2", name: "WhatsApp Chat with Ravi Kumar.txt", size: bytes.length, sha256: nodeDigest("sha256", bytes) };
+  const chatFile: FileRef = {
+    label: "R-2",
+    name: "WhatsApp Chat with Ravi Kumar.txt",
+    size: bytes.length,
+    sha256: nodeDigest("sha256", bytes),
+  };
   const attachments = new Map<string, FileRef>([
     ["IMG-20240115-WA0003.jpg", { label: "R-5", name: "IMG-20240115-WA0003.jpg", size: 245_001, sha256: "ab".repeat(32) }],
   ]);

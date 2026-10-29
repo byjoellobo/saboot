@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/mezpos/sakshya-kit/security/policy
+    about: Please do not open a public issue. Read SECURITY.md and report privately with "Report a vulnerability" on the Security tab.
+  - name: Need help with your own case?
+    url: https://nalsa.gov.in/
+    about: Sakshya Kit's maintainers cannot give legal advice. Please ask a practising advocate. For free legal aid in India, contact the National Legal Services Authority (NALSA) or your District Legal Services Authority.

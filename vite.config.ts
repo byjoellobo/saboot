@@ -31,7 +31,11 @@ const cspMeta: Plugin = {
   transformIndexHtml: () => [{ tag: "meta", attrs: { "http-equiv": "Content-Security-Policy", content: CSP }, injectTo: "head-prepend" }],
 };
 
+// Set SAKSHYA_BASE=/repo-name/ to host under a sub-path (e.g. GitHub Pages).
+const base = process.env.SAKSHYA_BASE ?? "/";
+
 export default defineConfig({
+  base,
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),
   },
@@ -64,7 +68,7 @@ export default defineConfig({
         globPatterns: ["**/*.{js,css,html,wasm,svg,png,ico,ttf,txt,webmanifest}"],
         maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
         navigateFallback: "index.html",
-        navigateFallbackDenylist: [/^\/verify/],
+        navigateFallbackDenylist: [/\/verify\.html/],
         cleanupOutdatedCaches: true,
       },
     }),
@@ -87,7 +91,8 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       include: ["src/engine/**/*.ts", "src/sakshya/**/*.ts"],
-      exclude: ["src/**/*.worker.ts", "src/engine/hash/hash-pool.ts", "src/engine/store/**", "src/**/*.d.ts"],
+      exclude: ["src/**/*.worker.ts", "src/engine/hash/hash-pool.ts", "src/**/*.d.ts"],
+      thresholds: { statements: 80, branches: 75, functions: 80, lines: 80 },
       reporter: ["text-summary", "text"],
     },
   },

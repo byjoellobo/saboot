@@ -5,7 +5,7 @@ import { MAX_CHAT_BYTES, parseChat } from "../../src/sakshya/whatsapp/parse";
 import { sampleCase } from "./fixtures";
 
 const enc = (s: string) => new TextEncoder().encode(s);
-const NNBSP = " ";
+const NNBSP = "\u202F";
 
 describe("parser fixes from review", () => {
   it("flags an iOS message that swallowed a header-shaped line (mixed terminators)", () => {
@@ -62,9 +62,9 @@ describe("parser fixes from review", () => {
 
 describe("verify link text cleaning", () => {
   it("strips bidi overrides and control characters from names", () => {
-    expect(cleanLinkText("invoice‮gpj.exe")).toBe("invoicegpj.exe");
-    expect(cleanLinkText("a\u0000b‏c")).toBe("abc");
-    const encoded = encodePayload({ caseRef: "Case‮1", items: [{ label: "R-1", name: "x⁦y", size: 1, sha256: "a".repeat(64) }] });
+    expect(cleanLinkText("invoice\u202Egpj.exe")).toBe("invoicegpj.exe");
+    expect(cleanLinkText("a\u0000b\u200Fc")).toBe("abc");
+    const encoded = encodePayload({ caseRef: "Case\u202E1", items: [{ label: "R-1", name: "x\u2066y", size: 1, sha256: "a".repeat(64) }] });
     const decoded = decodePayload(encoded);
     expect(decoded.caseRef).toBe("Case1");
     expect(decoded.items[0]?.name).toBe("xy");
@@ -75,6 +75,10 @@ describe("readiness checks", () => {
   it("warns when a manner-of-production template still has [blanks]", async () => {
     const c = await sampleCase();
     const withBlanks = { ...c, records: c.records.map((r) => ({ ...r, manner: "Exported on [date] from WhatsApp" })) };
-    expect(checkCase(withBlanks).map((i) => i.message).join("\n")).toMatch(/\[brackets\]/);
+    expect(
+      checkCase(withBlanks)
+        .map((i) => i.message)
+        .join("\n"),
+    ).toMatch(/\[brackets\]/);
   });
 });

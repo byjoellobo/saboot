@@ -134,8 +134,7 @@ const CLOUD_GUIDE: DeviceGuide = {
   title: "Cloud account (WhatsApp, Google, Apple)",
   sourceKind: "cloud",
   summary:
-    "Write down which service holds the evidence and the account it belongs to: the email address or phone number " +
-    "used to sign in.",
+    "Write down which service holds the evidence and the account it belongs to: the email address or phone number " + "used to sign in.",
   identifierSlots: [{ type: "Cloud ID", note: "account email / phone number" }],
   sections: [
     {

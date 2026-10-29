@@ -131,7 +131,12 @@ export function DeviceEditor({ initial, onSave, onCancel }: DeviceEditorProps) {
       <h2>{initial ? "Edit device" : `New device: ${guide.title}`}</h2>
       <DeviceGuidePanel guide={guide} />
 
-      <TextField label="A name you will recognise" value={device.nickname} onChange={(v) => set({ nickname: v })} placeholder="e.g. My phone, Shop CCTV recorder" />
+      <TextField
+        label="A name you will recognise"
+        value={device.nickname}
+        onChange={(v) => set({ nickname: v })}
+        placeholder="e.g. My phone, Shop CCTV recorder"
+      />
 
       <SelectField<SourceKind>
         label="Tick box on the certificate"
@@ -145,7 +150,12 @@ export function DeviceEditor({ initial, onSave, onCancel }: DeviceEditorProps) {
       )}
 
       <div className="row">
-        <TextField label="Make & Model" value={device.makeModel} onChange={(v) => set({ makeModel: v })} placeholder="e.g. Samsung Galaxy A54 5G (SM-A546E)" />
+        <TextField
+          label="Make & Model"
+          value={device.makeModel}
+          onChange={(v) => set({ makeModel: v })}
+          placeholder="e.g. Samsung Galaxy A54 5G (SM-A546E)"
+        />
         <TextField label="Colour" value={device.color} onChange={(v) => set({ color: v })} hint="Write what you see; no screen shows it." />
       </div>
       <TextField
@@ -183,14 +193,24 @@ export function DeviceEditor({ initial, onSave, onCancel }: DeviceEditorProps) {
                 </button>
               </div>
               {check && check.message && (
-                <p className={`small`} style={{ color: check.severity === "ok" ? "var(--ok)" : check.severity === "error" ? "var(--tape)" : "#8a4b00", marginTop: "-0.4rem" }}>
+                <p
+                  className={`small`}
+                  style={{
+                    color: check.severity === "ok" ? "var(--ok)" : check.severity === "error" ? "var(--tape)" : "#8a4b00",
+                    marginTop: "-0.4rem",
+                  }}
+                >
                   {check.message}
                 </p>
               )}
             </div>
           );
         })}
-        <button type="button" className="btn secondary" onClick={() => set({ identifiers: [...device.identifiers, { type: "Other", value: "", note: "" }] })}>
+        <button
+          type="button"
+          className="btn secondary"
+          onClick={() => set({ identifiers: [...device.identifiers, { type: "Other", value: "", note: "" }] })}
+        >
           Add another identifier
         </button>
         <p className="small">Leave empty rows blank; they are not printed. Never enter passwords, PINs or Aadhaar numbers here.</p>
@@ -200,7 +220,12 @@ export function DeviceEditor({ initial, onSave, onCancel }: DeviceEditorProps) {
         <legend>The device or record source is (Part A). Tick only what is true: you sign this.</legend>
         <div className="checks">
           {RELATION_BOXES.map((b) => (
-            <Check key={b.key} label={`${b.label} by me`} checked={device.relation[b.key]} onChange={(v) => set({ relation: { ...device.relation, [b.key]: v } })} />
+            <Check
+              key={b.key}
+              label={`${b.label} by me`}
+              checked={device.relation[b.key]}
+              onChange={(v) => set({ relation: { ...device.relation, [b.key]: v } })}
+            />
           ))}
         </div>
       </fieldset>
@@ -235,7 +260,11 @@ export function DeviceEditor({ initial, onSave, onCancel }: DeviceEditorProps) {
             </button>
           </div>
         )}
-        {clockError && <p className="small" style={{ color: "var(--tape)" }}>{clockError}</p>}
+        {clockError && (
+          <p className="small" style={{ color: "var(--tape)" }}>
+            {clockError}
+          </p>
+        )}
         {device.clock && <Notice tone="ok">{describeClock(device.clock, istStamp)}</Notice>}
       </fieldset>
 

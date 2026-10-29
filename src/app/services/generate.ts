@@ -17,11 +17,22 @@ export interface GeneratedPdf {
 const loader = browserFontLoader(import.meta.env.BASE_URL);
 
 function safeName(text: string): string {
-  return text.replace(/[^\p{L}\p{N}._ -]+/gu, "_").replace(/\s+/g, " ").trim().slice(0, 80) || "case";
+  return (
+    text
+      .replace(/[^\p{L}\p{N}._ -]+/gu, "_")
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, 80) || "case"
+  );
 }
 
 function caseRef(c: CaseFile): string {
-  return [c.caseNumber, c.court, c.title].map((s) => s.trim()).filter(Boolean).join(", ") || "Untitled case";
+  return (
+    [c.caseNumber, c.court, c.title]
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .join(", ") || "Untitled case"
+  );
 }
 
 export async function generateCertificate(c: CaseFile, verifyBaseUrl: string, includeBlankPartB: boolean): Promise<GeneratedPdf> {
@@ -51,10 +62,12 @@ export async function generateTranscript(
   if (!bytes) throw new Error("The chat text for this record is not stored on this device. Add the WhatsApp export again.");
   // The transcript prints the record's hash, so the stored bytes must still be exactly those bytes.
   if (bytes.length !== record.size || (await sha256Hex(bytes)) !== record.hashes.sha256) {
-    throw new Error(`The stored chat text no longer matches the SHA-256 recorded for ${record.label}. Add the original WhatsApp export again.`);
+    throw new Error(
+      `The stored chat text no longer matches the SHA-256 recorded for ${record.label}. Add the original WhatsApp export again.`,
+    );
   }
   const chat = await hashChat(bytes, parseChat(bytes, { dateOrder: range.dateOrder }));
-  const parent = record.parentId ? c.records.find((r) => r.id === record.parentId) ?? null : null;
+  const parent = record.parentId ? (c.records.find((r) => r.id === record.parentId) ?? null) : null;
   // Messages name attachments by file name only; if two files share a name, mark it ambiguous.
   const attachments = new Map<string, FileRef | null>();
   for (const r of c.records) {

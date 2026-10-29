@@ -1,0 +1,11 @@
+dist/
+dev-dist/
+coverage/
+test-results/
+playwright-report/
+node_modules/
+crates/*/target/
+public/fonts/
+docs/research/
+package-lock.json
+*.wasm

@@ -113,10 +113,19 @@ export const records: EvidenceRecord[] = [
 
 export async function sampleCase(): Promise<CaseFile> {
   let custody: CustodyEvent[] = [];
-  custody = await appendEvent(custody, { action: "case-created", actor: "Asha Rao", summary: "Case file created" }, new Date("2026-10-29T03:00:00Z"));
   custody = await appendEvent(
     custody,
-    { action: "record-hashed", actor: "Asha Rao", summary: "Hashed R-1 WhatsApp Chat with Ravi Kumar.zip", details: { sha256: records[0]?.hashes.sha256 ?? "", size: 18_234_567 } },
+    { action: "case-created", actor: "Asha Rao", summary: "Case file created" },
+    new Date("2026-10-29T03:00:00Z"),
+  );
+  custody = await appendEvent(
+    custody,
+    {
+      action: "record-hashed",
+      actor: "Asha Rao",
+      summary: "Hashed R-1 WhatsApp Chat with Ravi Kumar.zip",
+      details: { sha256: records[0]?.hashes.sha256 ?? "", size: 18_234_567 },
+    },
     new Date("2026-10-29T03:30:00Z"),
   );
   return {
@@ -127,7 +136,13 @@ export async function sampleCase(): Promise<CaseFile> {
     title: "Asha Rao v. Ravi Kumar (security deposit)",
     court: "Court of Small Causes, Bengaluru",
     caseNumber: "SC 1234/2026",
-    party: { name: "Asha Rao", relationOf: "daughter", relativeName: "K. Venkatesh Rao", address: "No. 12, 4th Cross, Indiranagar, Bengaluru 560038", place: "Bengaluru" },
+    party: {
+      name: "Asha Rao",
+      relationOf: "daughter",
+      relativeName: "K. Venkatesh Rao",
+      address: "No. 12, 4th Cross, Indiranagar, Bengaluru 560038",
+      place: "Bengaluru",
+    },
     expert: { name: "", relationOf: "", relativeName: "", address: "", place: "", designation: "" },
     devices: [phone, dvr],
     records,

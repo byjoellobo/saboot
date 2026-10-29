@@ -70,7 +70,7 @@ describe("custody log", () => {
 describe("verify link", () => {
   const items: VerifyItem[] = [
     { label: "A-1", name: "WhatsApp Chat with Ravi.zip", size: 1_234_567, sha256: SHA },
-    { label: "A-2", name: "ಸ್ಕ್ರೀನ್‌ಶಾಟ್ 2024.png", size: 5_000_000_000, sha256: "0".repeat(64) },
+    { label: "A-2", name: "ಸ್ಕ್ರೀನ್\u200Cಶಾಟ್ 2024.png", size: 5_000_000_000, sha256: "0".repeat(64) },
   ];
 
   it("round-trips a payload", () => {

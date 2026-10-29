@@ -23,7 +23,14 @@ export function QrSvg({ text, size = 160, title }: { text: string; size?: number
   }, [text]);
   const quiet = 2;
   return (
-    <svg role="img" aria-label={title} width={size} height={size} viewBox={`${-quiet} ${-quiet} ${n + quiet * 2} ${n + quiet * 2}`} shapeRendering="crispEdges">
+    <svg
+      role="img"
+      aria-label={title}
+      width={size}
+      height={size}
+      viewBox={`${-quiet} ${-quiet} ${n + quiet * 2} ${n + quiet * 2}`}
+      shapeRendering="crispEdges"
+    >
       <rect x={-quiet} y={-quiet} width={n + quiet * 2} height={n + quiet * 2} fill="#fff" />
       {cells.map((c) => (
         <rect key={`${c.x}-${c.y}`} x={c.x} y={c.y} width={c.w} height={1} fill="#000" />

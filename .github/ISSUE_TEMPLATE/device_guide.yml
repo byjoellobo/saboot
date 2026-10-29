@@ -1,0 +1,84 @@
+name: Device guide correction
+description: A step in a device guide is wrong, out of date or missing for your model.
+title: "[Device guide]: "
+labels: ["device-guide"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you. Menus change between models and software versions, so corrections from real devices are very useful.
+
+        **Do not post your device's real identifiers.** Never include a real IMEI, serial number, MAC address, EID, phone number or account name. If you attach a screenshot, cover those values first.
+
+        A link to the manufacturer's own documentation helps us mark a step as "official". Without one, we may add your correction marked as "unverified" until someone confirms it.
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Personal data
+      options:
+        - label: "I have removed all personal data: no real chats, phone numbers, IMEIs, names or case details"
+          required: true
+        - label: Any screenshot I attach has the IMEI, serial number, MAC address and other identifiers covered.
+          required: true
+  - type: dropdown
+    id: guide
+    attributes:
+      label: Which guide?
+      options:
+        - Android phone
+        - iPhone or iPad
+        - Windows PC or laptop
+        - Mac computer
+        - CCTV recorder (DVR or NVR)
+        - USB pen drive
+        - CD or DVD
+        - Cloud account (WhatsApp, Google, Apple)
+        - Server
+        - Other device
+    validations:
+      required: true
+  - type: input
+    id: make-model
+    attributes:
+      label: Device make and model
+      placeholder: "Samsung Galaxy A35, or CP Plus CP-UVR-0401E1"
+    validations:
+      required: true
+  - type: input
+    id: os-version
+    attributes:
+      label: Operating system or firmware version
+      placeholder: "Android 15, One UI 7; or DVR firmware V4.0.1"
+    validations:
+      required: true
+  - type: textarea
+    id: current-step
+    attributes:
+      label: Which step is wrong or missing?
+      description: Quote the section and step from the guide.
+    validations:
+      required: true
+  - type: textarea
+    id: actual-path
+    attributes:
+      label: What the menu path actually is
+      description: The exact names you tap or click, in order.
+      placeholder: "Settings > About phone > Status information > IMEI information"
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Source link (if any)
+      description: Manufacturer support page or manual that shows this path.
+      placeholder: "https://..."
+  - type: dropdown
+    id: checked-how
+    attributes:
+      label: How did you confirm this?
+      options:
+        - I checked on the device myself
+        - The manufacturer's documentation
+        - Another source (link it above)
+    validations:
+      required: true

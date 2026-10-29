@@ -1,0 +1,48 @@
+# Publishes the app (and the verify.html page the QR codes point to) to
+# GitHub Pages on every push to main. Enable it once in the repository:
+# Settings > Pages > Build and deployment > Source: GitHub Actions.
+#
+# With a custom domain, set the repository variable SAKSHYA_BASE to "/".
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      # Uses the committed, CI-checked wasm; no Rust toolchain needed here.
+      - run: npx vite build
+        env:
+          SAKSHYA_BASE: ${{ vars.SAKSHYA_BASE || format('/{0}/', github.event.repository.name) }}
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -8,10 +8,7 @@ const AMPM = `(?<ampm>[AaPp]\\.?${SP}?[Mm]\\.?)`;
 const DATE = "(?<d1>\\d{1,4})(?<sep>[/.\\-])(?<d2>\\d{1,2})\\k<sep>(?<d3>\\d{1,4})";
 
 /** Android: "27/08/23, 9:34<U+202F>pm - " or "16/11/2021, 13:49 - " */
-export const ANDROID_HEADER = new RegExp(
-  `^${DATE},?${SP}(?<time>\\d{1,2}[:.]\\d{2})(?:${SP}?${AMPM})?${SP}[-\\u2013]${SP}`,
-  "u",
-);
+export const ANDROID_HEADER = new RegExp(`^${DATE},?${SP}(?<time>\\d{1,2}[:.]\\d{2})(?:${SP}?${AMPM})?${SP}[-\\u2013]${SP}`, "u");
 
 /** iOS: "[28/07/24, 9:09:28<U+202F>PM] " with optional leading U+200E and optional era (" BE"). */
 export const IOS_HEADER = new RegExp(
@@ -46,7 +43,8 @@ export const ANDROID_ATTACHED = new RegExp(`^(?<file>.+?\\.[^\\s.()]*)\\s\\((?:$
 export const IOS_ATTACHED =
   /\u200E?<\s?(?:attached|adjunto|anexado|Anhang|adjunt|pièce jointe|allegato|bijlage|załącznik|вложение)\s?:\s?(?<file>[^<>\n]+?)\s?>/u;
 
-export const ANDROID_MEDIA_OMITTED = /^<(?:Media omitted|Multimedia omitido|Mídia oculta|Médias omis|Medien ausgeschlossen|मीडिया हटाया गया|मीडिया छोड़ा गया)>$/u;
+export const ANDROID_MEDIA_OMITTED =
+  /^<(?:Media omitted|Multimedia omitido|Mídia oculta|Médias omis|Medien ausgeschlossen|मीडिया हटाया गया|मीडिया छोड़ा गया)>$/u;
 
 export const IOS_OMITTED = new RegExp(
   "\\u200E(?:image|video|audio|sticker|GIF|document|Contact card) omitted$|" +
@@ -54,7 +52,8 @@ export const IOS_OMITTED = new RegExp(
   "u",
 );
 
-export const DELETED = /^\u200E?(?:This message was deleted|You deleted this message|यह मैसेज डिलीट कर दिया गया है|आपने यह मैसेज डिलीट किया)\.?$/u;
+export const DELETED =
+  /^\u200E?(?:This message was deleted|You deleted this message|यह मैसेज डिलीट कर दिया गया है|आपने यह मैसेज डिलीट किया)\.?$/u;
 export const EDITED_SUFFIX = / ?\u200E?<This message was edited>$/u;
 export const VIEW_ONCE = /^null$/u;
 export const LOCATION = /^\u200E?(?:location|Location|लोकेशन): (?<url>https?:\/\/\S+)$/u;

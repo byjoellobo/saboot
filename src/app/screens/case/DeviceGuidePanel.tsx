@@ -15,7 +15,10 @@ export function DeviceGuidePanel({ guide }: { guide: DeviceGuide }) {
       {guide.sections.map((s) => (
         <details key={s.id} className="guide-section">
           <summary>
-            {s.title} <span className="small">({s.steps.length} step{s.steps.length === 1 ? "" : "s"})</span>
+            {s.title}{" "}
+            <span className="small">
+              ({s.steps.length} step{s.steps.length === 1 ? "" : "s"})
+            </span>
           </summary>
           <ol>
             {s.steps.map((step, i) => (

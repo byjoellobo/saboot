@@ -95,7 +95,8 @@ export function checkEid(input: string): IdCheck {
 
 export function checkSerial(input: string): IdCheck {
   const value = input.trim();
-  if (!value) return { severity: "warning", normalized: "", message: "Serial number is empty. Write 'Not available' if the device has none." };
+  if (!value)
+    return { severity: "warning", normalized: "", message: "Serial number is empty. Write 'Not available' if the device has none." };
   if (/^(0+|1234567890?|unknown|n\/?a|default string|to be filled by o\.?e\.?m\.?)$/i.test(value)) {
     return {
       severity: "warning",

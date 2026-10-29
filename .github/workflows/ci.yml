@@ -1,0 +1,106 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    name: Web app (lint, types, unit, build, e2e)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Formatting
+        run: npm run format:check
+
+      - name: Type check
+        run: npx tsc --noEmit -p tsconfig.json
+
+      - name: Unit tests with coverage
+        run: npx vitest run --coverage
+
+      # `npm run build` would try to rebuild the wasm first. This job uses the
+      # committed wasm; the rust job checks that it matches the source.
+      - name: Production build
+        run: npx vite build
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: End-to-end tests
+        run: npx playwright test
+
+      - name: Upload Playwright results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  rust:
+    name: Rust hasher (tests, clippy, wasm match)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+          components: clippy
+
+      # crates/sakshya-hash/rust-toolchain.toml pins the compiler, because the
+      # committed wasm is compared byte for byte. rustup only reads that file
+      # when cargo runs inside the crate folder, so install the pinned
+      # toolchain here and run every cargo command from that folder.
+      - name: Install pinned Rust toolchain
+        working-directory: crates/sakshya-hash
+        run: |
+          rustup toolchain install
+          rustc --version
+
+      - name: Rust tests
+        working-directory: crates/sakshya-hash
+        run: cargo test --locked --manifest-path Cargo.toml
+
+      - name: Clippy
+        working-directory: crates/sakshya-hash
+        run: cargo clippy --locked --all-targets --manifest-path Cargo.toml -- -D warnings
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Committed wasm matches the Rust source
+        run: npm run wasm:check

@@ -154,7 +154,12 @@ describe("date order inference and edge cases", () => {
   });
 
   it("handles 24-hour UK format with four-digit years, BOM and missing final newline", () => {
-    const bytes = new Uint8Array([0xef, 0xbb, 0xbf, ...enc("24/03/2020, 13:41 - Max: IMG-20200324-WA0014.jpg (file attached)\n24/03/2020, 13:42 - Max: done")]);
+    const bytes = new Uint8Array([
+      0xef,
+      0xbb,
+      0xbf,
+      ...enc("24/03/2020, 13:41 - Max: IMG-20200324-WA0014.jpg (file attached)\n24/03/2020, 13:42 - Max: done"),
+    ]);
     const chat = parseChat(bytes);
     expect(chat.preambleBytes).toBe(3);
     expect(chat.messages[0]?.localTime).toBe("2020-03-24T13:41:00");

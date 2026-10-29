@@ -10,15 +10,7 @@ import { runCargo } from "./cargo.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const manifest = join(root, "crates", "sakshya-hash", "Cargo.toml");
-const built = join(
-  root,
-  "crates",
-  "sakshya-hash",
-  "target",
-  "wasm32-unknown-unknown",
-  "release",
-  "sakshya_hash.wasm",
-);
+const built = join(root, "crates", "sakshya-hash", "target", "wasm32-unknown-unknown", "release", "sakshya_hash.wasm");
 const dest = join(root, "src", "engine", "hash", "sakshya_hash.wasm");
 
 function hasCargo() {
@@ -41,7 +33,7 @@ if (!hasCargo()) {
 }
 
 try {
-  runCargo(["build", "--release", "--target", "wasm32-unknown-unknown", "--manifest-path", manifest]);
+  runCargo(["build", "--release", "--target", "wasm32-unknown-unknown", "--manifest-path", manifest], { remapPaths: true });
 } catch (err) {
   if (existsSync(dest)) {
     console.warn("[wasm] build failed; keeping committed", dest);

@@ -64,7 +64,8 @@ export function DevicesStep({ handle, caseFile: c }: StepProps) {
                 className="btn link"
                 aria-label={`Remove ${deviceTitle(d)}`}
                 onClick={() => {
-                  if (window.confirm(`Remove ${deviceTitle(d)}? Its records will need another device.`)) void handle.update((cur) => removeDevice(cur, d.id));
+                  if (window.confirm(`Remove ${deviceTitle(d)}? Its records will need another device.`))
+                    void handle.update((cur) => removeDevice(cur, d.id));
                 }}
               >
                 Remove

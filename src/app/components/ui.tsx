@@ -8,9 +8,7 @@ export function Stamp({ children, big = false }: { children: ReactNode; big?: bo
 
 /** The one animated moment: a stamp that lands when a file finishes hashing. */
 export function HashedStamp({ fresh }: { fresh: boolean }) {
-  return (
-    <span className={fresh ? "hashed-stamp fresh" : "hashed-stamp"}>HASHED</span>
-  );
+  return <span className={fresh ? "hashed-stamp fresh" : "hashed-stamp"}>HASHED</span>;
 }
 
 export function Notice({
@@ -110,7 +108,20 @@ interface TextFieldProps {
   inputMode?: "text" | "numeric" | "tel" | "email" | "url";
 }
 
-export function TextField({ id: givenId, label, value, onChange, hint, message, placeholder, mono, multiline, type = "text", autoComplete = "off", inputMode }: TextFieldProps) {
+export function TextField({
+  id: givenId,
+  label,
+  value,
+  onChange,
+  hint,
+  message,
+  placeholder,
+  mono,
+  multiline,
+  type = "text",
+  autoComplete = "off",
+  inputMode,
+}: TextFieldProps) {
   const autoId = useId();
   const id = givenId ?? autoId;
   const hintId = `${id}-hint`;
@@ -130,7 +141,14 @@ export function TextField({ id: givenId, label, value, onChange, hint, message, 
       {multiline ? (
         <textarea {...common} />
       ) : (
-        <input {...common} type={type} className={mono ? "mono" : undefined} autoComplete={autoComplete} inputMode={inputMode} spellCheck={!mono} />
+        <input
+          {...common}
+          type={type}
+          className={mono ? "mono" : undefined}
+          autoComplete={autoComplete}
+          inputMode={inputMode}
+          spellCheck={!mono}
+        />
       )}
       {hint && (
         <span className="hint" id={hintId}>
@@ -184,7 +202,17 @@ export function Check({ label, checked, onChange }: { label: ReactNode; checked:
   );
 }
 
-export function DropZone({ onFiles, title, detail, multiple = true }: { onFiles: (files: File[]) => void; title: string; detail: ReactNode; multiple?: boolean }) {
+export function DropZone({
+  onFiles,
+  title,
+  detail,
+  multiple = true,
+}: {
+  onFiles: (files: File[]) => void;
+  title: string;
+  detail: ReactNode;
+  multiple?: boolean;
+}) {
   const [over, setOver] = useState(false);
   const input = useRef<HTMLInputElement>(null);
   const detailId = useId();

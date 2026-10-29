@@ -1,0 +1,110 @@
+name: WhatsApp export not read
+description: Sakshya Kit does not recognise or correctly read a WhatsApp chat export.
+title: "[WhatsApp format]: "
+labels: ["whatsapp-format"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        WhatsApp writes chat exports differently depending on the phone, the WhatsApp version, the language and the region. To support a new format we need the exact details of that format, **not your chat**.
+
+        **Never paste or attach a real chat**, not even your own. The other people in it have not agreed to share their messages, names or phone numbers.
+
+        Instead, please make a synthetic sample:
+
+        1. With a friend's agreement, start a test chat with them. Before you export, save their contact under a made-up name such as "Test Friend", so that no real name or phone number appears in the file.
+        2. Type 3 to 5 short, made-up messages (for example "Test message one").
+        3. Use **Export chat** in WhatsApp, without media, on the same phone where the real export failed, with the same language and region settings.
+        4. Open the `.txt` file and check that it contains no real names, phone numbers or other personal details.
+
+        Invisible characters matter. WhatsApp uses special spaces and direction marks (for example a narrow no-break space before "am"/"pm", or a left-to-right mark at the start of a line), and line endings differ between Android and iPhone. Copying and pasting text often removes them, so **please attach the synthetic `.txt` file itself**, as well as pasting the lines below.
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Personal data
+      options:
+        - label: "I have removed all personal data: no real chats, phone numbers, IMEIs, names or case details"
+          required: true
+        - label: The sample below was typed by me in a test chat made for this report, with the other person's agreement. It is not copied from a real conversation.
+          required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Phone operating system
+      options:
+        - Android
+        - iOS (iPhone)
+        - Other (say which below)
+    validations:
+      required: true
+  - type: input
+    id: os-version
+    attributes:
+      label: Operating system version
+      placeholder: "Android 15, or iOS 18.4"
+    validations:
+      required: true
+  - type: input
+    id: phone-model
+    attributes:
+      label: Phone make and model (optional)
+      placeholder: "Redmi Note 13"
+  - type: input
+    id: whatsapp-version
+    attributes:
+      label: WhatsApp version
+      description: Usually shown under Help in WhatsApp's settings. Say if it is WhatsApp Business.
+      placeholder: "2.25.31.72"
+    validations:
+      required: true
+  - type: input
+    id: language
+    attributes:
+      label: App language
+      description: The language WhatsApp (and the phone) are set to.
+      placeholder: "English (India), or Hindi"
+    validations:
+      required: true
+  - type: input
+    id: region
+    attributes:
+      label: Region and date format
+      description: The phone's region, and how dates and times look in the chat.
+      placeholder: "India; dates like 27/08/26, 12-hour clock"
+    validations:
+      required: true
+  - type: dropdown
+    id: export-type
+    attributes:
+      label: How was the failing export made?
+      options:
+        - Without media (a .txt file)
+        - Include media / attach media (a .zip file)
+        - Not sure
+    validations:
+      required: true
+  - type: textarea
+    id: sample
+    attributes:
+      label: Synthetic sample (3 to 5 lines)
+      description: Paste the lines from your synthetic test export exactly as they appear in the file.
+      render: text
+      placeholder: |
+        27/08/26, 9:30 pm - Test Friend: Test message one
+        27/08/26, 9:31 pm - Test Friend: Test message two
+    validations:
+      required: true
+  - type: textarea
+    id: attachment
+    attributes:
+      label: Attach the synthetic .txt file
+      description: Drag the synthetic test export (.txt only, never a .zip with media) into this box. If you cannot attach it, say why.
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What did Sakshya Kit show?
+      description: The error message, or what was wrong in the transcript (for example the wrong author, time or message split).
+    validations:
+      required: true

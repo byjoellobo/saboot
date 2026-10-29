@@ -34,9 +34,13 @@ function plain(text: string): Span {
   return { text };
 }
 
-
 function caseRef(c: CaseFile): string {
-  return [c.caseNumber, c.court, c.title].map((s) => s.trim()).filter(Boolean).join(", ") || "Untitled case";
+  return (
+    [c.caseNumber, c.court, c.title]
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .join(", ") || "Untitled case"
+  );
 }
 
 function includedRecords(c: CaseFile): EvidenceRecord[] {
@@ -89,13 +93,36 @@ async function deponent(w: PdfWriter, p: Person): Promise<void> {
 
 async function deviceBlock(w: PdfWriter, device: Device | null, records: readonly EvidenceRecord[], partIntro: string): Promise<void> {
   await w.paragraph([plain(partIntro)], BODY);
-  await w.checkboxes(S.SOURCE_BOXES.map((b) => ({ label: b.label, checked: device?.sourceKind === b.key })), BODY, 8);
+  await w.checkboxes(
+    S.SOURCE_BOXES.map((b) => ({ label: b.label, checked: device?.sourceKind === b.key })),
+    BODY,
+    8,
+  );
   await w.paragraph([plain(`${S.DEVICE_FIELDS.other} `), fill(device?.sourceKind === "other" ? device.otherKindText : "", 40)], BODY);
-  await w.paragraph([plain(`${S.DEVICE_FIELDS.makeModel} `), fill(device?.makeModel ?? ""), plain(`    ${S.DEVICE_FIELDS.color} `), fill(device?.color ?? "", 14)], BODY);
-  await w.paragraph([plain(`${S.DEVICE_FIELDS.serial} `), fill(device?.serial ?? "")], BODY);
-  await w.paragraph([plain(`${S.DEVICE_FIELDS.identifiers} `), fill(device ? describeIdentifiers(device) : "", 36), plain(` ${S.DEVICE_FIELDS.identifiersSuffix}`)], BODY);
   await w.paragraph(
-    [plain(`${S.DEVICE_FIELDS.otherInfo} `), fill(device ? otherInfoText(device, records, istStamp) : "", 40), plain(` ${S.DEVICE_FIELDS.otherInfoSuffix}`)],
+    [
+      plain(`${S.DEVICE_FIELDS.makeModel} `),
+      fill(device?.makeModel ?? ""),
+      plain(`    ${S.DEVICE_FIELDS.color} `),
+      fill(device?.color ?? "", 14),
+    ],
+    BODY,
+  );
+  await w.paragraph([plain(`${S.DEVICE_FIELDS.serial} `), fill(device?.serial ?? "")], BODY);
+  await w.paragraph(
+    [
+      plain(`${S.DEVICE_FIELDS.identifiers} `),
+      fill(device ? describeIdentifiers(device) : "", 36),
+      plain(` ${S.DEVICE_FIELDS.identifiersSuffix}`),
+    ],
+    BODY,
+  );
+  await w.paragraph(
+    [
+      plain(`${S.DEVICE_FIELDS.otherInfo} `),
+      fill(device ? otherInfoText(device, records, istStamp) : "", 40),
+      plain(` ${S.DEVICE_FIELDS.otherInfoSuffix}`),
+    ],
     BODY,
   );
 }
@@ -157,7 +184,13 @@ async function signatureBlock(w: PdfWriter, captionText: string, person: Person,
   await w.paragraph([plain(`${S.PLACE_LINE} `), fill(person.place, 20)], BODY);
 }
 
-async function partA(w: PdfWriter, c: CaseFile, device: Device, records: readonly EvidenceRecord[], opts: CertificateOptions): Promise<void> {
+async function partA(
+  w: PdfWriter,
+  c: CaseFile,
+  device: Device,
+  records: readonly EvidenceRecord[],
+  opts: CertificateOptions,
+): Promise<void> {
   w.newPage();
   await qrCorner(w, c, records, opts);
   await caption(w, c);
@@ -165,7 +198,11 @@ async function partA(w: PdfWriter, c: CaseFile, device: Device, records: readonl
   await deponent(w, c.party);
   await deviceBlock(w, device, records, S.PART_A_SOURCE_INTRO);
   await w.paragraph([plain(S.PART_A_LAWFUL_CONTROL)], BODY);
-  await w.checkboxes(S.RELATION_BOXES.map((b) => ({ label: b.label, checked: device.relation[b.key] })), BODY, 8);
+  await w.checkboxes(
+    S.RELATION_BOXES.map((b) => ({ label: b.label, checked: device.relation[b.key] })),
+    BODY,
+    8,
+  );
   await w.paragraph([plain(S.RELATION_SUFFIX)], BODY);
   await hashBlock(w, c, records);
   await signatureBlock(w, S.SIGNATURE_CAPTION_A, c.party);
@@ -215,17 +252,21 @@ async function qrCorner(w: PdfWriter, c: CaseFile, records: readonly EvidenceRec
   const x = A4[0] - w.margin.right - size;
   const top = A4[1] - 22;
   w.drawQr(buildVerifyUrl(opts.verifyBaseUrl, { caseRef: caseRef(c), items: first }), x, top, size);
-  const note = groups.length > 1 ? `Verify ${first[0]?.label}–${first[first.length - 1]?.label}; more in Annexure H` : "Scan to verify files";
+  const note =
+    groups.length > 1 ? `Verify ${first[0]?.label}–${first[first.length - 1]?.label}; more in Annexure H` : "Scan to verify files";
   await w.textAt(note, x - 2, top - size - 7, 5.5, "sans", MUTED);
 }
 
 async function guidance(w: PdfWriter, c: CaseFile, opts: CertificateOptions): Promise<void> {
   const recs = includedRecords(c);
   await w.paragraph([{ text: "READ THIS FIRST  (guidance page: remove before filing)", style: "sansBold", color: WARN }], 12);
-  await w.paragraph([plain(`Prepared for: ${caseRef(c)}. Generated on ${istStamp(opts.generatedAt)} with Sakshya Kit ${opts.appVersion}.`)], BODY);
+  await w.paragraph(
+    [plain(`Prepared for: ${caseRef(c)}. Generated on ${istStamp(opts.generatedAt)} with Sakshya Kit ${opts.appVersion}.`)],
+    BODY,
+  );
   w.rule();
   const bullets: string[] = [
-    "Sakshya Kit is a software tool. It is not a lawyer and it is not the \"expert\" referred to in section 63(4) of the Bharatiya Sakshya Adhiniyam, 2023. Nothing in this bundle is legal advice. Have a practising advocate review every page before it is filed.",
+    'Sakshya Kit is a software tool. It is not a lawyer and it is not the "expert" referred to in section 63(4) of the Bharatiya Sakshya Adhiniyam, 2023. Nothing in this bundle is legal advice. Have a practising advocate review every page before it is filed.',
     "PART A is for you, the person in charge of the device. Check every filled value (shown in blue) against the device, then sign in ink and write the date and the time (IST, 24-hour) at which you sign.",
     "PART B must be completed and signed by an expert. The pre-filled PART B is only a draft to save the expert time: the expert must independently examine the records and recompute each hash value. A blank PART B and a worksheet are included for this.",
     "Who can sign PART B is not settled. On 22 May 2026 the Supreme Court (Pune Bar Association v. Union of India, W.P.(C) No. 599 of 2026) kept this question of law open. It observed that, besides an Examiner of Electronic Evidence notified under section 79A of the IT Act, 2000, a person may possibly sign if the court is satisfied, on unimpeachable material, of their special skill and expertise in computer science and cyber forensics. Ask your advocate whom to approach.",
@@ -250,7 +291,9 @@ async function guidance(w: PdfWriter, c: CaseFile, opts: CertificateOptions): Pr
 async function hashReport(w: PdfWriter, c: CaseFile, opts: CertificateOptions): Promise<void> {
   w.newPage();
   await w.heading("ANNEXURE H: HASH REPORT", 13, "center");
-  await w.paragraph([plain("(enclosed with the certificate under section 63(4)(c) of the Bharatiya Sakshya Adhiniyam, 2023)")], 8.5, { align: "center" });
+  await w.paragraph([plain("(enclosed with the certificate under section 63(4)(c) of the Bharatiya Sakshya Adhiniyam, 2023)")], 8.5, {
+    align: "center",
+  });
   await w.paragraph(
     [
       plain(
@@ -289,22 +332,52 @@ async function hashReport(w: PdfWriter, c: CaseFile, opts: CertificateOptions): 
       const labels = group.map((g) => g.label).join(", ");
       const textX = w.margin.left + size + 10;
       await w.textAt(`Scan to check records ${labels}`, textX, top - 14, 9, "sansBold");
-      await w.textAt("Opens a page that hashes the file on the scanning device. Files are never uploaded.", textX, top - 27, 7.5, "sans", MUTED);
+      await w.textAt(
+        "Opens a page that hashes the file on the scanning device. Files are never uploaded.",
+        textX,
+        top - 27,
+        7.5,
+        "sans",
+        MUTED,
+      );
       w.y = top - size - 6;
       for (const r of recs.filter((x) => group.some((g) => g.label === x.label))) {
         const parent = r.parentId ? c.records.find((p) => p.id === r.parentId) : null;
         const kv: [string, Span[]][] = [
           ["File name", [plain(r.fileName)]],
-          ...(r.zipPath ? ([["Inside archive", [plain(`${r.zipPath}${parent ? ` (in ${parent.label}, ${parent.fileName})` : ""}`)]]] as [string, Span[]][]) : []),
+          ...(r.zipPath
+            ? ([["Inside archive", [plain(`${r.zipPath}${parent ? ` (in ${parent.label}, ${parent.fileName})` : ""}`)]]] as [
+                string,
+                Span[],
+              ][])
+            : []),
           ["Description", [plain(r.description || "-")]],
           ["Manner of production", [plain(r.manner || "-")]],
           ["Size", [plain(formatBytes(r.size))]],
-          ["Modified (as reported)", [plain(r.zipModified ? `${r.zipModified.replace("T", " ")} (zip entry time, device local time)` : r.lastModified ? istStamp(new Date(r.lastModified)) : "-")]],
+          [
+            "Modified (as reported)",
+            [
+              plain(
+                r.zipModified
+                  ? `${r.zipModified.replace("T", " ")} (zip entry time, device local time)`
+                  : r.lastModified
+                    ? istStamp(new Date(r.lastModified))
+                    : "-",
+              ),
+            ],
+          ],
           ["MD5", [{ text: r.hashes.md5, style: "mono" }]],
           ["SHA-1", [{ text: r.hashes.sha1, style: "mono" }]],
           ["SHA-256", [{ text: r.hashes.sha256, style: "mono" }]],
           ["Hashed at", [plain(istStamp(new Date(r.hashedAt)))]],
-          ...(r.crcOk === null ? [] : ([["Zip integrity", [plain(r.crcOk ? "CRC32 stored in the zip matches the extracted data" : "CRC32 MISMATCH: archive may be damaged")]]] as [string, Span[]][])),
+          ...(r.crcOk === null
+            ? []
+            : ([
+                [
+                  "Zip integrity",
+                  [plain(r.crcOk ? "CRC32 stored in the zip matches the extracted data" : "CRC32 MISMATCH: archive may be damaged")],
+                ],
+              ] as [string, Span[]][])),
         ];
         await w.table(
           [
@@ -322,7 +395,11 @@ async function expertWorksheet(w: PdfWriter, c: CaseFile): Promise<void> {
   w.newPage();
   await w.heading("EXPERT'S VERIFICATION WORKSHEET", 12, "center");
   await w.paragraph(
-    [plain("Optional aid for the expert completing PART B. Recompute each value with your own tools from the records produced, write it in the blank column, and mark whether it matches the value stated by the party.")],
+    [
+      plain(
+        "Optional aid for the expert completing PART B. Recompute each value with your own tools from the records produced, write it in the blank column, and mark whether it matches the value stated by the party.",
+      ),
+    ],
     8.6,
   );
   const rows = includedRecords(c).map((r) => [
@@ -375,7 +452,20 @@ async function custodyAnnex(w: PdfWriter, c: CaseFile): Promise<void> {
       [
         { spans: [plain(e.summary)], size: 7.4 },
         ...(Object.keys(e.details).length
-          ? [{ spans: [{ text: Object.entries(e.details).map(([k, v]) => `${k}: ${v}`).join("\n"), color: MUTED, style: "mono" as const }], size: 5.8 }]
+          ? [
+              {
+                spans: [
+                  {
+                    text: Object.entries(e.details)
+                      .map(([k, v]) => `${k}: ${v}`)
+                      .join("\n"),
+                    color: MUTED,
+                    style: "mono" as const,
+                  },
+                ],
+                size: 5.8,
+              },
+            ]
           : []),
       ],
       [{ spans: [{ text: e.hash, style: "mono" }], size: 5.8 }],
@@ -389,7 +479,8 @@ export async function buildCertificatePdf(c: CaseFile, opts: CertificateOptions)
   const w = await PdfWriter.create({
     loader: opts.loader,
     title: `Section 63(4) BSA certificate bundle: ${caseRef(c)}`,
-    subject: "Certificate under section 63(4)(c), Bharatiya Sakshya Adhiniyam, 2023, with Hash Report (draft prepared with Sakshya Kit; not legal advice)",
+    subject:
+      "Certificate under section 63(4)(c), Bharatiya Sakshya Adhiniyam, 2023, with Hash Report (draft prepared with Sakshya Kit; not legal advice)",
     keywords: ["BSA", "section 63", "electronic evidence", "hash report"],
     createdAt: opts.generatedAt,
   });

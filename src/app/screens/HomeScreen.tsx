@@ -5,6 +5,8 @@ import { deleteCase, listCases, saveCase } from "../state/db";
 import { navigate } from "../router";
 import { Notice, Stamp } from "../components/ui";
 import { importBackup } from "../services/backup";
+import { createDemoCase, demoFiles } from "../services/demo";
+import { queueFilesForCase } from "../state/use-ingest";
 
 export function HomeScreen() {
   const [cases, setCases] = useState<CaseFile[] | null>(null);
@@ -24,6 +26,16 @@ export function HomeScreen() {
     navigate({ name: "case", id: c.id, step: "details" });
   };
 
+  const tryDemo = async () => {
+    try {
+      const c = await createDemoCase();
+      queueFilesForCase(c.id, demoFiles());
+      navigate({ name: "case", id: c.id, step: "records" });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not create the demo case.");
+    }
+  };
+
   const restore = async (file: File) => {
     try {
       const c = await importBackup(file);
@@ -40,12 +52,15 @@ export function HomeScreen() {
         <h1>Prepare electronic evidence for court</h1>
         <p className="lede">
           Add a WhatsApp chat export, screenshots, call recordings or CCTV footage. Sakshya Kit hashes every file on this device, helps you
-          find the device's IMEI, serial or MAC address, and drafts the section 63(4) certificate with a hash report and a QR code anyone can
-          use to check the files.
+          find the device's IMEI, serial or MAC address, and drafts the section 63(4) certificate with a hash report and a QR code anyone
+          can use to check the files.
         </p>
         <div className="actions">
           <button type="button" className="btn" onClick={create}>
             Start a new case
+          </button>
+          <button type="button" className="btn secondary" onClick={() => void tryDemo()}>
+            Try a demo case
           </button>
           <button type="button" className="btn secondary" onClick={() => restoreInput.current?.click()}>
             Restore a backup
@@ -77,8 +92,8 @@ export function HomeScreen() {
                   <a href={`#/case/${encodeURIComponent(c.id)}/records`}>{caseDisplayName(c)}</a>
                   <br />
                   <span className="small">
-                    {c.records.length} record{c.records.length === 1 ? "" : "s"}, {c.devices.length} device{c.devices.length === 1 ? "" : "s"}.
-                    Last changed {new Date(c.updatedAt).toLocaleString("en-IN")}
+                    {c.records.length} record{c.records.length === 1 ? "" : "s"}, {c.devices.length} device
+                    {c.devices.length === 1 ? "" : "s"}. Last changed {new Date(c.updatedAt).toLocaleString("en-IN")}
                   </span>
                 </span>
                 <span>

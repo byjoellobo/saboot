@@ -1,0 +1,60 @@
+name: Feature request
+description: Suggest an improvement or a new feature.
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for the suggestion.
+
+        Sakshya Kit keeps every file and case detail on the user's device. It has no accounts, analytics or uploads, and it is not legal advice. Requests that need any of those are unlikely to be accepted, but tell us the problem anyway: there may be another way to solve it.
+
+        **Do not include personal data** such as real chats, phone numbers, IMEIs, names or case details.
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Personal data
+      options:
+        - label: "I have removed all personal data: no real chats, phone numbers, IMEIs, names or case details"
+          required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: Who runs into it (a litigant, an advocate, an expert, a court clerk) and what are they trying to do?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would you like to happen?
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Hashing and adding files
+        - WhatsApp chat or transcript
+        - Device guides
+        - Certificate PDF
+        - Check page and QR codes
+        - Custody log
+        - Backup and restore
+        - Offline use
+        - Accessibility
+        - Languages and translation
+        - Something else
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Other approaches you considered
+  - type: textarea
+    id: legal-basis
+    attributes:
+      label: Legal or official source (if relevant)
+      description: If the request is about what the certificate or the law requires, link the statute, Gazette notification, rule or judgment it is based on.

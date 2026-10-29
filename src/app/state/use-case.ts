@@ -98,26 +98,23 @@ export function useCase(id: string): CaseHandle {
     [persist],
   );
 
-  const update = useCallback(
-    (fn: CaseUpdater) => {
-      const run = queue.current.then(async () => {
-        const current = latest.current;
-        if (!current) return null;
-        const next = await fn(current);
-        if (next !== current) {
-          latest.current = next;
-          setCaseFile(next);
-          await saveCase(next);
-          setSaveError(null);
-        }
-        return next;
-      });
-      queue.current = run.catch((e: unknown) => setSaveError(message(e)));
-      // Failures are reported through saveError; callers get null and can skip follow-up work.
-      return run.catch(() => null);
-    },
-    [],
-  );
+  const update = useCallback((fn: CaseUpdater) => {
+    const run = queue.current.then(async () => {
+      const current = latest.current;
+      if (!current) return null;
+      const next = await fn(current);
+      if (next !== current) {
+        latest.current = next;
+        setCaseFile(next);
+        await saveCase(next);
+        setSaveError(null);
+      }
+      return next;
+    });
+    queue.current = run.catch((e: unknown) => setSaveError(message(e)));
+    // Failures are reported through saveError; callers get null and can skip follow-up work.
+    return run.catch(() => null);
+  }, []);
 
   return { caseFile, loading, error, saveError, set, update };
 }

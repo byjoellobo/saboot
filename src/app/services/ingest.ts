@@ -79,9 +79,7 @@ async function ingestZip(file: File, pool: HashPool, ctx: IngestContext, onProgr
 
   // A damaged entry (CRC mismatch) is never used as the chat text.
   const chatEntryPaths = new Set(
-    outcome.entries
-      .filter((e) => e.bytes && e.crcOk !== false && isChatTextName(e.entry.path) && isChat(e.bytes))
-      .map((e) => e.entry.path),
+    outcome.entries.filter((e) => e.bytes && e.crcOk !== false && isChatTextName(e.entry.path) && isChat(e.bytes)).map((e) => e.entry.path),
   );
   const isWhatsApp = chatEntryPaths.size > 0;
   const parent = baseRecord(
@@ -98,7 +96,12 @@ async function ingestZip(file: File, pool: HashPool, ctx: IngestContext, onProgr
     const name = e.entry.path.split("/").pop() || e.entry.path;
     const isChatText = chatEntryPaths.has(e.entry.path);
     const rec: EvidenceRecord = {
-      ...baseRecord({ name, type: "", size: digests.size, lastModified: null }, digests, isChatText ? "chat-text" : kindFromFile(name, ""), ctx),
+      ...baseRecord(
+        { name, type: "", size: digests.size, lastModified: null },
+        digests,
+        isChatText ? "chat-text" : kindFromFile(name, ""),
+        ctx,
+      ),
       parentId: parent.id,
       zipPath: e.entry.path,
       zipModified: e.entry.modified,
@@ -113,7 +116,8 @@ async function ingestZip(file: File, pool: HashPool, ctx: IngestContext, onProgr
 
   for (const e of outcome.entries) {
     if (e.error) warnings.push(`${e.entry.path}: ${e.error}`);
-    else if (e.crcOk === false) warnings.push(`${e.entry.path}: the zip's stored checksum does not match the data. The archive may be damaged.`);
+    else if (e.crcOk === false)
+      warnings.push(`${e.entry.path}: the zip's stored checksum does not match the data. The archive may be damaged.`);
   }
   if (mediaCount > MEDIA_LIST_LIMIT) {
     warnings.push(
@@ -153,7 +157,12 @@ async function ingestPlain(file: File, pool: HashPool, ctx: IngestContext, onPro
   return { records: [rec], chats, events: [hashedEvent(rec, ctx.actor)], warnings: [] };
 }
 
-export async function ingestFile(file: File, pool: HashPool, ctx: IngestContext, onProgress: (p: JobProgress) => void): Promise<IngestOutcome> {
+export async function ingestFile(
+  file: File,
+  pool: HashPool,
+  ctx: IngestContext,
+  onProgress: (p: JobProgress) => void,
+): Promise<IngestOutcome> {
   // Only unpack files named .zip. Word/Excel/APK files are zips inside, but
   // they are single documents and must stay single records.
   if (/\.zip$/i.test(file.name) && (await looksLikeZip(file))) return ingestZip(file, pool, ctx, onProgress);

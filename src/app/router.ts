@@ -3,9 +3,7 @@ import { useEffect, useState } from "react";
 export type Step = "details" | "records" | "devices" | "generate" | "log";
 
 export type Route =
-  | { readonly name: "home" }
-  | { readonly name: "learn" }
-  | { readonly name: "case"; readonly id: string; readonly step: Step };
+  { readonly name: "home" } | { readonly name: "learn" } | { readonly name: "case"; readonly id: string; readonly step: Step };
 
 const STEPS: readonly Step[] = ["details", "records", "devices", "generate", "log"];
 

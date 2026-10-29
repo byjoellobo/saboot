@@ -8,7 +8,7 @@ import type { CaseFile } from "../../sakshya/model";
 
 interface SakshyaDB extends DBSchema {
   cases: { key: string; value: CaseFile };
-  chats: { key: string; value: { recordId: string; caseId: string; bytes: Uint8Array } ; indexes: { byCase: string } };
+  chats: { key: string; value: { recordId: string; caseId: string; bytes: Uint8Array }; indexes: { byCase: string } };
   settings: { key: string; value: unknown };
 }
 
@@ -90,6 +90,20 @@ export async function getSetting<T>(key: string, fallback: T): Promise<T> {
 
 export async function setSetting(key: string, value: unknown): Promise<void> {
   await (await db()).put("settings", value, key);
+}
+
+/** Remove every case, chat text and setting stored by Sakshya Kit on this device. */
+export async function deleteAllData(): Promise<void> {
+  if (dbPromise) {
+    (await dbPromise).close();
+    dbPromise = null;
+  }
+  await new Promise<void>((resolve, reject) => {
+    const req = indexedDB.deleteDatabase("sakshya-kit");
+    req.onsuccess = () => resolve();
+    req.onerror = () => reject(req.error ?? new Error("Could not delete the data"));
+    req.onblocked = () => reject(new Error("Close Sakshya Kit in other tabs, then try again."));
+  });
 }
 
 /** Ask the browser not to evict our data under storage pressure. */

@@ -16,17 +16,7 @@ import * as P from "./patterns";
 export type Platform = "android" | "ios";
 export type DateOrder = "DMY" | "MDY" | "YMD";
 export type MessageKind =
-  | "text"
-  | "system"
-  | "attachment"
-  | "media-omitted"
-  | "deleted"
-  | "view-once"
-  | "location"
-  | "poll"
-  | "call"
-  | "pending"
-  | "empty";
+  "text" | "system" | "attachment" | "media-omitted" | "deleted" | "view-once" | "location" | "poll" | "call" | "pending" | "empty";
 
 export interface ChatMessage {
   /** 1-based position in the export. */
@@ -285,7 +275,9 @@ export function parseChat(bytes: Uint8Array, options: ParseOptions = {}): Parsed
   const crlfCount = lines.filter((l) => l.crlf).length;
   const boundaryMethod = platform === "ios" && crlfCount > 0 ? "crlf-records" : "header-lines";
   if (platform === "ios" && crlfCount === 0) {
-    warnings.push("This iOS export has no CRLF line endings, so it was probably converted by another program. Message boundaries were found by matching headers instead.");
+    warnings.push(
+      "This iOS export has no CRLF line endings, so it was probably converted by another program. Message boundaries were found by matching headers instead.",
+    );
   }
 
   const drafts: Draft[] = [];
@@ -332,9 +324,10 @@ export function parseChat(bytes: Uint8Array, options: ParseOptions = {}): Parsed
     const rest = recordText.slice(headerText.length);
     const split = splitAuthor(rest, platform);
     const lineStartsWithLrm = d.first.text.startsWith("\u200E");
-    const classified = split.authorRaw === null && platform === "android"
-      ? { kind: "system" as const, attachment: null, edited: false, body: cleanText(rest) }
-      : classifyBody(split.body, platform, lineStartsWithLrm);
+    const classified =
+      split.authorRaw === null && platform === "android"
+        ? { kind: "system" as const, attachment: null, edited: false, body: cleanText(rest) }
+        : classifyBody(split.body, platform, lineStartsWithLrm);
     const isSystem = classified.kind === "system";
     const author = split.authorRaw !== null && !isSystem ? cleanText(split.authorRaw).trim() : null;
     if (author) authorCounts.set(author, (authorCounts.get(author) ?? 0) + 1);
@@ -350,7 +343,9 @@ export function parseChat(bytes: Uint8Array, options: ParseOptions = {}): Parsed
       index: i + 1,
       byteStart,
       byteEnd,
-      timestampText: cleanText(headerText).replace(/^\[|\]\s*$|\s*[-–]\s*$/g, "").trim(),
+      timestampText: cleanText(headerText)
+        .replace(/^\[|\]\s*$|\s*[-–]\s*$/g, "")
+        .trim(),
       localTime: time,
       authorRaw: isSystem ? null : split.authorRaw,
       author,

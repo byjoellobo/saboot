@@ -31,7 +31,12 @@ export function DetailsStep({ handle, caseFile: c }: StepProps) {
       </p>
 
       <h2>The case</h2>
-      <TextField label="Court" value={c.court} onChange={(v) => setCase({ court: v })} placeholder="e.g. Court of Small Causes, Bengaluru" />
+      <TextField
+        label="Court"
+        value={c.court}
+        onChange={(v) => setCase({ court: v })}
+        placeholder="e.g. Court of Small Causes, Bengaluru"
+      />
       <div className="row">
         <TextField label="Case number" value={c.caseNumber} onChange={(v) => setCase({ caseNumber: v })} placeholder="e.g. SC 1234/2026" />
         <TextField label="Case title" value={c.title} onChange={(v) => setCase({ title: v })} placeholder="e.g. Asha Rao v. Ravi Kumar" />

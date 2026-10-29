@@ -128,9 +128,18 @@ describe("device guides", () => {
     for (const profile of ["android", "iphone"] as const) {
       const slots = GUIDES[profile].identifierSlots;
       expect(slots.filter((s) => s.type === "IMEI").length, profile).toBe(2);
-      expect(slots.some((s) => s.type === "EID"), profile).toBe(true);
-      expect(slots.some((s) => s.type === "MAC"), profile).toBe(true);
-      expect(slots.some((s) => s.type === "Cloud ID"), profile).toBe(true);
+      expect(
+        slots.some((s) => s.type === "EID"),
+        profile,
+      ).toBe(true);
+      expect(
+        slots.some((s) => s.type === "MAC"),
+        profile,
+      ).toBe(true);
+      expect(
+        slots.some((s) => s.type === "Cloud ID"),
+        profile,
+      ).toBe(true);
     }
   });
 
@@ -140,9 +149,7 @@ describe("device guides", () => {
     const targets = cctv.sections.flatMap((s) => s.targets);
     expect(targets).toContain("clock");
     expect(targets).toContain("export");
-    const clockPaths = cctv.sections
-      .filter((s) => s.targets.includes("clock"))
-      .flatMap((s) => s.steps.map((step) => step.path ?? ""));
+    const clockPaths = cctv.sections.filter((s) => s.targets.includes("clock")).flatMap((s) => s.steps.map((step) => step.path ?? ""));
     expect(clockPaths).toContain("https://www.nplindia.org/clockcode/html/");
   });
 

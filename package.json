@@ -1,17 +1,43 @@
 {
   "name": "sakshya-kit",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Offline-first helper for preparing the Section 63(4) Bharatiya Sakshya Adhiniyam electronic evidence certificate. Files never leave the device.",
   "license": "AGPL-3.0-or-later",
+  "homepage": "https://github.com/mezpos/sakshya-kit#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mezpos/sakshya-kit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mezpos/sakshya-kit/issues"
+  },
+  "keywords": [
+    "evidence",
+    "bharatiya-sakshya-adhiniyam",
+    "section-63",
+    "hash",
+    "sha256",
+    "whatsapp",
+    "cctv",
+    "pwa",
+    "offline",
+    "webassembly",
+    "india",
+    "legal-tech"
+  ],
   "type": "module",
   "scripts": {
     "wasm": "node scripts/build-wasm.mjs",
+    "wasm:check": "node scripts/check-wasm.mjs",
     "fonts": "node scripts/fetch-fonts.mjs",
     "dev": "vite",
     "build": "npm run wasm && tsc --noEmit -p tsconfig.json && vite build",
     "preview": "vite preview --port 4791",
     "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
@@ -21,7 +47,7 @@
     "icons": "pwa-assets-generator --preset minimal-2023 public/logo.svg"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=20.19"
   },
   "dependencies": {
     "@pdf-lib/fontkit": "^1.1.1",
@@ -36,6 +62,7 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.5",
     "@playwright/test": "1.56",
     "@types/node": "^24.19.2",
     "@types/qrcode": "^1.5.6",
@@ -43,10 +70,15 @@
     "@types/react-dom": "^19.3.0",
     "@vite-pwa/assets-generator": "^1.0.4",
     "@vitejs/plugin-react": "^5.2.0",
-    "@vitest/coverage-v8": "^4.1.11",
+    "@vitest/coverage-v8": "^4.1.12",
+    "eslint": "^9.39.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.13.0",
+    "prettier": "^3.9.10",
     "typescript": "5.9",
+    "typescript-eslint": "^8.72.1",
     "vite": "^7.3.7",
     "vite-plugin-pwa": "^1.2.0",
-    "vitest": "^4.1.11"
+    "vitest": "^4.1.12"
   }
 }

@@ -274,8 +274,7 @@ export const CCTV_GUIDE: DeviceGuide = {
           confidence: "official",
         },
         {
-          text:
-            "XMEye: the app logs in with the recorder's serial number. Write it as 'XMEye Serial No. (cloud login)'.",
+          text: "XMEye: the app logs in with the recorder's serial number. Write it as 'XMEye Serial No. (cloud login)'.",
           confidence: "official",
         },
         {
@@ -334,9 +333,7 @@ export const CCTV_GUIDE: DeviceGuide = {
           confidence: "official",
         },
         {
-          text:
-            "After the export you may repeat the photo. Then check that the exported files play and show the " +
-            "expected times.",
+          text: "After the export you may repeat the photo. Then check that the exported files play and show the " + "expected times.",
           confidence: "official",
         },
         {
@@ -452,8 +449,7 @@ export const CCTV_GUIDE: DeviceGuide = {
         },
         {
           text:
-            "CP Plus, on the recorder's own screen: this path is confirmed only for one CP Plus mobile NVR. Other " +
-            "models may differ.",
+            "CP Plus, on the recorder's own screen: this path is confirmed only for one CP Plus mobile NVR. Other " + "models may differ.",
           path: "Main menu > Video > Backup",
           confidence: "unverified",
         },

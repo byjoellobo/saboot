@@ -40,8 +40,7 @@ export class HashPool {
   private nextId = 1;
 
   constructor(
-    private readonly makeWorker: () => Worker = () =>
-      new Worker(new URL("./hash.worker.ts", import.meta.url), { type: "module" }),
+    private readonly makeWorker: () => Worker = () => new Worker(new URL("./hash.worker.ts", import.meta.url), { type: "module" }),
     private readonly size: number = defaultSize(),
   ) {}
 

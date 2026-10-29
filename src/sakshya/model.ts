@@ -2,17 +2,7 @@ import type { CustodyEvent } from "../engine/custody/custody-log";
 import type { RelationKey, SourceKind } from "./certificate/schedule";
 
 /** Which step-by-step guide to show when recording a device. */
-export type DeviceProfile =
-  | "android"
-  | "iphone"
-  | "windows"
-  | "mac"
-  | "cctv"
-  | "usb"
-  | "disc"
-  | "server"
-  | "cloud"
-  | "other";
+export type DeviceProfile = "android" | "iphone" | "windows" | "mac" | "cctv" | "usb" | "disc" | "server" | "cloud" | "other";
 
 export type IdentifierType = "IMEI" | "MAC" | "Cloud ID" | "UIN" | "UID" | "EID" | "Other";
 
@@ -48,15 +38,7 @@ export interface Device {
   readonly clock: ClockCheck | null;
 }
 
-export type RecordKind =
-  | "whatsapp-export"
-  | "chat-text"
-  | "image"
-  | "audio"
-  | "video"
-  | "document"
-  | "archive"
-  | "other";
+export type RecordKind = "whatsapp-export" | "chat-text" | "image" | "audio" | "video" | "document" | "archive" | "other";
 
 export interface RecordHashes {
   readonly md5: string;

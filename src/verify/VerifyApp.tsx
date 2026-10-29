@@ -6,8 +6,10 @@ import { useMemo, useRef, useState } from "react";
 import { HashCancelled, sharedPool } from "../engine/hash/hash-pool";
 import type { Digests } from "../engine/hash/wasm-hasher";
 import { formatBytes, groupHex, shortSize } from "../engine/util/format";
-import { decodePayload, type VerifyPayload } from "../engine/verify/verify-link";
+import { decodePayload } from "../engine/verify/verify-link";
 import { DropZone, Notice, Progress, Stamp, TextField } from "../app/components/ui";
+import { readExpectedList, UNKNOWN_SIZE, type ExpectedList } from "./expected-list";
+import { MessageCheck } from "./MessageCheck";
 
 type Outcome =
   | { readonly kind: "match"; readonly label: string; readonly name: string }
@@ -25,29 +27,43 @@ interface Checked {
   readonly error: string | null;
 }
 
-function readPayload(): { payload: VerifyPayload | null; error: string | null } {
+function readPayload(): { payload: ExpectedList | null; error: string | null } {
   const hash = window.location.hash;
   if (!hash || hash === "#") return { payload: null, error: null };
   try {
-    return { payload: decodePayload(hash), error: null };
+    const decoded = decodePayload(hash);
+    return { payload: { source: "link", caseRef: decoded.caseRef, items: decoded.items }, error: null };
   } catch (e) {
     return { payload: null, error: e instanceof Error ? e.message : "The link could not be read." };
   }
 }
 
-function judge(d: Digests, payload: VerifyPayload | null, manual: string): Outcome {
+function judge(d: Digests, payload: ExpectedList | null, manual: string): Outcome {
   const want = manual.trim().toLowerCase().replace(/\s+/g, "");
   if (want && [d.sha256, d.sha1, d.md5].includes(want)) return { kind: "manual-match" };
   const hit = payload?.items.find((i) => i.sha256 === d.sha256);
   if (hit) return { kind: "match", label: hit.label, name: hit.name };
-  const sameSize = payload?.items.find((i) => i.size === d.size);
+  const sameSize = payload?.items.find((i) => i.size !== UNKNOWN_SIZE && i.size === d.size);
   if (sameSize) return { kind: "same-size", label: sameSize.label, name: sameSize.name };
   return { kind: "no-match" };
 }
 
 export function VerifyApp() {
-  const { payload, error } = useMemo(readPayload, []);
+  const fromLink = useMemo(readPayload, []);
+  const [payload, setPayload] = useState<ExpectedList | null>(fromLink.payload);
+  const [error, setError] = useState<string | null>(fromLink.error);
   const [manual, setManual] = useState("");
+  const listInput = useRef<HTMLInputElement>(null);
+
+  const loadList = async (file: File) => {
+    try {
+      setPayload(await readExpectedList(file));
+      setError(null);
+      setChecked([]);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "That file could not be read.");
+    }
+  };
   const [checked, setChecked] = useState<Checked[]>([]);
   const nextKey = useRef(1);
 
@@ -57,10 +73,14 @@ export function VerifyApp() {
       setChecked((cs) => [{ key: k, name: file.name, size: file.size, progress: null, digests: null, outcome: null, error: null }, ...cs]);
       sharedPool()
         .hashFile(file, (p) => setChecked((cs) => cs.map((c) => (c.key === k ? { ...c, progress: { done: p.done, total: p.total } } : c))))
-        .promise.then((d) => setChecked((cs) => cs.map((c) => (c.key === k ? { ...c, digests: d, outcome: judge(d, payload, manual) } : c))))
+        .promise.then((d) =>
+          setChecked((cs) => cs.map((c) => (c.key === k ? { ...c, digests: d, outcome: judge(d, payload, manual) } : c))),
+        )
         .catch((e: unknown) => {
           if (e instanceof HashCancelled) return;
-          setChecked((cs) => cs.map((c) => (c.key === k ? { ...c, error: e instanceof Error ? e.message : "Could not read the file." } : c)));
+          setChecked((cs) =>
+            cs.map((c) => (c.key === k ? { ...c, error: e instanceof Error ? e.message : "Could not read the file." } : c)),
+          );
         });
     }
   };
@@ -69,7 +89,7 @@ export function VerifyApp() {
     <>
       <header className="topbar">
         <a className="brand" href="./">
-          <img src="/logo.svg" alt="" width={34} height={34} />
+          <img src={`${import.meta.env.BASE_URL}logo.svg`} alt="" width={34} height={34} />
           <span>Sakshya Kit: check a file</span>
         </a>
       </header>
@@ -77,19 +97,30 @@ export function VerifyApp() {
         <section className="sheet">
           <h1>Check a file against a hash report</h1>
           <p className="lede">
-            Choose a file to see whether it is bit-for-bit identical to a record listed in a Sakshya Kit certificate. The file is read on this
-            device only. It is never uploaded.
+            Choose a file to see whether it is bit-for-bit identical to a record listed in a Sakshya Kit certificate. The file is read on
+            this device only. It is never uploaded.
           </p>
 
-          {error && <Notice tone="warn" title="This link could not be read">{error} You can still paste a hash value below.</Notice>}
+          {error && (
+            <Notice tone="warn" title="This could not be read">
+              {error} You can still load a hash list or paste a hash value below.
+            </Notice>
+          )}
 
           {payload && (
             <>
               <Notice title="Where this list comes from">
-                <p>
-                  The records below were written into the link or QR code you opened, on the page at <code>{window.location.host}</code>.
-                  The link itself is not signed: compare these values with the printed hash report before relying on a match.
-                </p>
+                {payload.source === "link" ? (
+                  <p>
+                    The records below were written into the link or QR code you opened, on the page at <code>{window.location.host}</code>.
+                    The link itself is not signed: compare these values with the printed hash report before relying on a match.
+                  </p>
+                ) : (
+                  <p>
+                    The records below come from the {payload.source} you chose on this device. Compare them with the printed hash report
+                    before relying on a match.
+                  </p>
+                )}
               </Notice>
               <p>
                 Records listed for <strong>{payload.caseRef}</strong>:
@@ -100,7 +131,7 @@ export function VerifyApp() {
                     <div className="record-head">
                       <Stamp>{i.label}</Stamp>
                       <span className="name">{i.name}</span>
-                      <span className="small">{shortSize(i.size)}</span>
+                      {i.size !== UNKNOWN_SIZE && <span className="small">{shortSize(i.size)}</span>}
                     </div>
                     <div className="hash">
                       <span className="alg">SHA-256</span>
@@ -112,6 +143,23 @@ export function VerifyApp() {
               </ul>
             </>
           )}
+
+          <div className="actions">
+            <button type="button" className="btn secondary" onClick={() => listInput.current?.click()}>
+              {payload ? "Load a different hash list" : "Load a hash list or case backup"}
+            </button>
+            <input
+              ref={listInput}
+              type="file"
+              accept=".txt,.sha256,.json,text/plain,application/json"
+              hidden
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) void loadList(f);
+                e.target.value = "";
+              }}
+            />
+          </div>
 
           {!payload && (
             <TextField
@@ -131,7 +179,9 @@ export function VerifyApp() {
                 <span className="name">{c.name}</span>
                 <span className="small">{formatBytes(c.size)}</span>
               </div>
-              {!c.digests && !c.error && <Progress done={c.progress?.done ?? 0} total={c.progress?.total ?? c.size} label={`Hashing ${c.name}`} />}
+              {!c.digests && !c.error && (
+                <Progress done={c.progress?.done ?? 0} total={c.progress?.total ?? c.size} label={`Hashing ${c.name}`} />
+              )}
               {c.error && <Notice tone="warn">{c.error}</Notice>}
               {c.outcome?.kind === "match" && (
                 <Notice tone="ok" title={`Matches ${c.outcome.label}`}>
@@ -140,7 +190,8 @@ export function VerifyApp() {
               )}
               {c.outcome?.kind === "manual-match" && (
                 <Notice tone="ok" title="Matches the hash value you entered">
-                  This file produces exactly the hash value you entered. SHA-256 matches are the strongest; MD5 and SHA-1 are older algorithms.
+                  This file produces exactly the hash value you entered. SHA-256 matches are the strongest; MD5 and SHA-1 are older
+                  algorithms.
                 </Notice>
               )}
               {c.outcome?.kind === "same-size" && (
@@ -169,9 +220,11 @@ export function VerifyApp() {
             </div>
           ))}
 
+          <MessageCheck />
+
           <p className="small">
-            A match shows the file is the same one that was hashed. It does not show whether what the file contains is true, and this page is
-            not legal advice.
+            A match shows the file is the same one that was hashed. It does not show whether what the file contains is true, and this page
+            is not legal advice.
           </p>
         </section>
       </main>

@@ -20,13 +20,14 @@ export function LogStep({ caseFile: c }: { caseFile: CaseFile }) {
         one before it, so changing or deleting an old entry would break the chain. This catches accidental or careless changes; it does not
         prove who wrote the log, because it is kept on your own device. It is printed as Annexure C of the certificate bundle.
       </p>
-      {check && (check.ok ? (
-        <Notice tone="ok">All {c.custody.length} entries link to each other correctly.</Notice>
-      ) : (
-        <Notice tone="warn" title="The chain is broken">
-          Entry {check.brokenAt}: {check.reason}.
-        </Notice>
-      ))}
+      {check &&
+        (check.ok ? (
+          <Notice tone="ok">All {c.custody.length} entries link to each other correctly.</Notice>
+        ) : (
+          <Notice tone="warn" title="The chain is broken">
+            Entry {check.brokenAt}: {check.reason}.
+          </Notice>
+        ))}
       <div style={{ overflowX: "auto" }} role="region" aria-label="Custody log entries" tabIndex={0}>
         <table className="log">
           <thead>

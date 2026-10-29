@@ -54,7 +54,13 @@ describe("readiness checks", () => {
   it("warns about bad identifiers, missing manner and missing clock check", async () => {
     const c = await sampleCase();
     const devices = [
-      { ...phone, identifiers: [{ type: "IMEI" as const, value: "490154203237519", note: "" }, { type: "MAC" as const, value: "DA:A1:19:00:00:01", note: "" }] },
+      {
+        ...phone,
+        identifiers: [
+          { type: "IMEI" as const, value: "490154203237519", note: "" },
+          { type: "MAC" as const, value: "DA:A1:19:00:00:01", note: "" },
+        ],
+      },
       { ...dvr, clock: null, relation: { owned: false, maintained: false, managed: false, operated: false } },
     ];
     const issues = checkCase({ ...c, devices, records: c.records.map((r) => ({ ...r, manner: "" })), party: { ...c.party, name: "" } });
@@ -70,7 +76,9 @@ describe("readiness checks", () => {
 
 describe("device descriptions", () => {
   it("lists identifiers with notes", () => {
-    expect(describeIdentifiers(phone)).toBe("IMEI (SIM 1): 490154203237518; MAC (Wi-Fi hardware address): 3C:5A:B4:01:23:45; Cloud ID: +91 00000 00004 (WhatsApp)");
+    expect(describeIdentifiers(phone)).toBe(
+      "IMEI (SIM 1): 490154203237518; MAC (Wi-Fi hardware address): 3C:5A:B4:01:23:45; Cloud ID: +91 00000 00004 (WhatsApp)",
+    );
   });
 
   it("computes and describes a recorder clock offset", () => {
@@ -80,6 +88,8 @@ describe("device descriptions", () => {
     expect(() => clockOffsetSeconds("not a time", actual)).toThrow();
     const text = describeClock(dvr.clock ?? { deviceShows: "", actualAt: "", offsetSeconds: 0 }, istStamp);
     expect(text).toContain("3 min 20 s ahead of actual IST");
-    expect(describeClock({ deviceShows: "2026-10-28T14:02:10", actualAt: actual.toISOString(), offsetSeconds: 0 }, istStamp)).toContain("matching actual time");
+    expect(describeClock({ deviceShows: "2026-10-28T14:02:10", actualAt: actual.toISOString(), offsetSeconds: 0 }, istStamp)).toContain(
+      "matching actual time",
+    );
   });
 });
