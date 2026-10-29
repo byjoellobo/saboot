@@ -1,0 +1,23 @@
+Sakshya Kit
+Copyright (C) 2026 Sakshya Kit contributors
+
+Sakshya Kit is free software: you can redistribute it and/or modify it under
+the terms of the GNU Affero General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your option) any
+later version. See LICENSE.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. It is not legal advice. See LICENSE and DISCLAIMER.md.
+
+Components under other licences:
+
+- crates/sakshya-hash: MIT OR Apache-2.0, at your option
+  (crates/sakshya-hash/LICENSE-MIT, crates/sakshya-hash/LICENSE-APACHE).
+- public/fonts: Noto fonts by Google, SIL Open Font License 1.1
+  (public/fonts/OFL.txt).
+- Third-party npm and Rust dependencies keep their own licences (MIT, ISC,
+  Apache-2.0, BSD); see package-lock.json and crates/sakshya-hash/Cargo.lock.
+
+The statutory text reproduced in src/sakshya/certificate/schedule.ts is from
+the Bharatiya Sakshya Adhiniyam, 2023, as published in the Gazette of India.

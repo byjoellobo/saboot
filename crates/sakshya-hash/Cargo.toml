@@ -1,0 +1,23 @@
+[package]
+name = "sakshya-hash"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "Streaming MD5 + SHA-1 + SHA-256 + CRC32 hasher compiled to WebAssembly for Sakshya Kit"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+md-5 = { version = "0.11", default-features = false }
+sha1 = { version = "0.11", default-features = false }
+sha2 = { version = "0.11", default-features = false }
+crc32fast = { version = "1.5", default-features = false }
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true

@@ -1,0 +1,52 @@
+{
+  "name": "sakshya-kit",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Offline-first helper for preparing the Section 63(4) Bharatiya Sakshya Adhiniyam electronic evidence certificate. Files never leave the device.",
+  "license": "AGPL-3.0-or-later",
+  "type": "module",
+  "scripts": {
+    "wasm": "node scripts/build-wasm.mjs",
+    "fonts": "node scripts/fetch-fonts.mjs",
+    "dev": "vite",
+    "build": "npm run wasm && tsc --noEmit -p tsconfig.json && vite build",
+    "preview": "vite preview --port 4791",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:rust": "node scripts/cargo.mjs test --manifest-path crates/sakshya-hash/Cargo.toml",
+    "lint:rust": "node scripts/cargo.mjs clippy --all-targets --manifest-path crates/sakshya-hash/Cargo.toml -- -D warnings",
+    "test:e2e": "playwright test",
+    "icons": "pwa-assets-generator --preset minimal-2023 public/logo.svg"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@pdf-lib/fontkit": "^1.1.1",
+    "fflate": "^0.8.3",
+    "idb": "^8.0.4",
+    "pdf-lib": "^1.17.1",
+    "pdf-rfc3161": "^0.3.0",
+    "qrcode": "^1.5.4",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "regenerator-runtime": "^0.14.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56",
+    "@types/node": "^24.19.2",
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vite-pwa/assets-generator": "^1.0.4",
+    "@vitejs/plugin-react": "^5.2.0",
+    "@vitest/coverage-v8": "^4.1.11",
+    "typescript": "5.9",
+    "vite": "^7.3.7",
+    "vite-plugin-pwa": "^1.2.0",
+    "vitest": "^4.1.11"
+  }
+}
