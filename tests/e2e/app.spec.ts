@@ -44,7 +44,7 @@ test("hash files, record a device and generate the certificate and transcript", 
   await acceptFirstRun(page);
 
   await page.getByRole("button", { name: "Start a new case" }).click();
-  await page.getByLabel("Court").fill("Court of Small Causes, Bengaluru");
+  await page.getByLabel("Court", { exact: true }).fill("Court of Small Causes, Bengaluru");
   await page.getByLabel("Case number").fill("SC 1234/2026");
   await page.getByLabel("Your full name").fill("Asha Rao");
   await page.getByLabel("Residing or employed at").fill("Indiranagar, Bengaluru");
