@@ -54,7 +54,7 @@ jobs:
 
       - name: Upload Playwright results
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-results
           path: |
@@ -109,7 +109,7 @@ jobs:
       # can inspect it (and, after review, commit it).
       - name: Upload rebuilt wasm
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: rebuilt-wasm
           path: crates/saboot-hash/target/wasm32-unknown-unknown/release/saboot_hash.wasm
