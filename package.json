@@ -1,16 +1,16 @@
 {
-  "name": "sakshya-kit",
-  "version": "0.2.0",
+  "name": "saboot",
+  "version": "0.3.0",
   "private": true,
   "description": "Offline-first helper for preparing the Section 63(4) Bharatiya Sakshya Adhiniyam electronic evidence certificate. Files never leave the device.",
   "license": "AGPL-3.0-or-later",
-  "homepage": "https://github.com/mezpos/sakshya-kit#readme",
+  "homepage": "https://github.com/byjoellobo/saboot#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mezpos/sakshya-kit.git"
+    "url": "git+https://github.com/byjoellobo/saboot.git"
   },
   "bugs": {
-    "url": "https://github.com/mezpos/sakshya-kit/issues"
+    "url": "https://github.com/byjoellobo/saboot/issues"
   },
   "keywords": [
     "evidence",
@@ -41,8 +41,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "test:rust": "node scripts/cargo.mjs test --manifest-path crates/sakshya-hash/Cargo.toml",
-    "lint:rust": "node scripts/cargo.mjs clippy --all-targets --manifest-path crates/sakshya-hash/Cargo.toml -- -D warnings",
+    "test:rust": "node scripts/cargo.mjs test --manifest-path crates/saboot-hash/Cargo.toml",
+    "lint:rust": "node scripts/cargo.mjs clippy --all-targets --manifest-path crates/saboot-hash/Cargo.toml -- -D warnings",
     "test:e2e": "playwright test",
     "icons": "pwa-assets-generator --preset minimal-2023 public/logo.svg"
   },

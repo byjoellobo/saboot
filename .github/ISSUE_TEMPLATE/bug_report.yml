@@ -1,5 +1,5 @@
 name: Bug report
-description: Something in Sakshya Kit does not work as it should.
+description: Something in Saboot does not work as it should.
 title: "[Bug]: "
 labels: ["bug"]
 body:
@@ -10,7 +10,7 @@ body:
 
         **Do not include personal data.** Issues are public. Never paste or attach real chats, evidence files, screenshots that show real people, phone numbers, IMEIs, serial numbers, MAC addresses, names, addresses or case details. If you need to show a file, make a small test file yourself.
 
-        If the problem could expose someone's data or make Sakshya Kit show a wrong hash, please report it privately instead, as explained in the [security policy](https://github.com/mezpos/sakshya-kit/security/policy).
+        If the problem could expose someone's data or make Saboot show a wrong hash, please report it privately instead, as explained in the [security policy](https://github.com/byjoellobo/saboot/security/policy).
 
         We cannot give legal advice about your case.
   - type: checkboxes
@@ -23,8 +23,8 @@ body:
   - type: input
     id: version
     attributes:
-      label: Sakshya Kit version
-      description: Shown at the bottom of the app, for example "Sakshya Kit 0.1.0".
+      label: Saboot version
+      description: Shown at the bottom of the app, for example "Saboot 0.1.0".
       placeholder: "0.1.0"
     validations:
       required: true

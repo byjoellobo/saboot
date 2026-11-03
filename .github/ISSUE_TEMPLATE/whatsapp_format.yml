@@ -1,5 +1,5 @@
 name: WhatsApp export not read
-description: Sakshya Kit does not recognise or correctly read a WhatsApp chat export.
+description: Saboot does not recognise or correctly read a WhatsApp chat export.
 title: "[WhatsApp format]: "
 labels: ["whatsapp-format"]
 body:
@@ -104,7 +104,7 @@ body:
   - type: textarea
     id: what-happened
     attributes:
-      label: What did Sakshya Kit show?
+      label: What did Saboot show?
       description: The error message, or what was wrong in the transcript (for example the wrong author, time or message split).
     validations:
       required: true

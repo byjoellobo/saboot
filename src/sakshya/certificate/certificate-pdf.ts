@@ -215,7 +215,7 @@ async function partBDraft(w: PdfWriter, c: CaseFile, device: Device, records: re
     [
       {
         text:
-          "DRAFT, NOT AN EXPERT OPINION. The party prepared this draft with Sakshya Kit, a software tool, for the expert's convenience. " +
+          "DRAFT, NOT AN EXPERT OPINION. The party prepared this draft with Saboot, a software tool, for the expert's convenience. " +
           "The expert must independently examine the device or records and recompute every hash value. This draft is not for " +
           "signature: the expert signs the blank PART B in this bundle, or their own clean copy, after verifying everything.",
         style: "sansBold",
@@ -261,12 +261,12 @@ async function guidance(w: PdfWriter, c: CaseFile, opts: CertificateOptions): Pr
   const recs = includedRecords(c);
   await w.paragraph([{ text: "READ THIS FIRST  (guidance page: remove before filing)", style: "sansBold", color: WARN }], 12);
   await w.paragraph(
-    [plain(`Prepared for: ${caseRef(c)}. Generated on ${istStamp(opts.generatedAt)} with Sakshya Kit ${opts.appVersion}.`)],
+    [plain(`Prepared for: ${caseRef(c)}. Generated on ${istStamp(opts.generatedAt)} with Saboot ${opts.appVersion}.`)],
     BODY,
   );
   w.rule();
   const bullets: string[] = [
-    'Sakshya Kit is a software tool. It is not a lawyer and it is not the "expert" referred to in section 63(4) of the Bharatiya Sakshya Adhiniyam, 2023. Nothing in this bundle is legal advice. Have a practising advocate review every page before it is filed.',
+    'Saboot is a software tool. It is not a lawyer and it is not the "expert" referred to in section 63(4) of the Bharatiya Sakshya Adhiniyam, 2023. Nothing in this bundle is legal advice. Have a practising advocate review every page before it is filed.',
     "PART A is for you, the person in charge of the device. Check every filled value (shown in blue) against the device, then sign in ink and write the date and the time (IST, 24-hour) at which you sign.",
     "PART B must be completed and signed by an expert. The pre-filled PART B is only a draft to save the expert time: the expert must independently examine the records and recompute each hash value. A blank PART B and a worksheet are included for this.",
     "Who can sign PART B is not settled. On 22 May 2026 the Supreme Court (Pune Bar Association v. Union of India, W.P.(C) No. 599 of 2026) kept this question of law open. It observed that, besides an Examiner of Electronic Evidence notified under section 79A of the IT Act, 2000, a person may possibly sign if the court is satisfied, on unimpeachable material, of their special skill and expertise in computer science and cyber forensics. Ask your advocate whom to approach.",
@@ -298,7 +298,7 @@ async function hashReport(w: PdfWriter, c: CaseFile, opts: CertificateOptions): 
     [
       plain(
         `Each record below was read in full on the party's own device and hashed with MD5, SHA-1 and SHA-256 in a single pass ` +
-          `(Sakshya Kit ${opts.appVersion}; Rust md-5/sha1/sha2 implementations compiled to WebAssembly). A hash value changes completely ` +
+          `(Saboot ${opts.appVersion}; Rust md-5/sha1/sha2 implementations compiled to WebAssembly). A hash value changes completely ` +
           `if even one bit of the file changes. Sizes are exact byte counts. "Modified" times are as reported by the operating system or ` +
           `stored inside the zip and may reflect copying rather than creation.`,
       ),
@@ -480,7 +480,7 @@ export async function buildCertificatePdf(c: CaseFile, opts: CertificateOptions)
     loader: opts.loader,
     title: `Section 63(4) BSA certificate bundle: ${caseRef(c)}`,
     subject:
-      "Certificate under section 63(4)(c), Bharatiya Sakshya Adhiniyam, 2023, with Hash Report (draft prepared with Sakshya Kit; not legal advice)",
+      "Certificate under section 63(4)(c), Bharatiya Sakshya Adhiniyam, 2023, with Hash Report (draft prepared with Saboot; not legal advice)",
     keywords: ["BSA", "section 63", "electronic evidence", "hash report"],
     createdAt: opts.generatedAt,
   });
@@ -497,7 +497,7 @@ export async function buildCertificatePdf(c: CaseFile, opts: CertificateOptions)
   const stamp = istStamp(opts.generatedAt);
   const ref = (c.caseNumber.trim() || c.title.trim() || "Untitled case").slice(0, 40);
   return w.finish((n, total) => ({
-    left: `${ref} · Draft prepared with Sakshya Kit ${opts.appVersion} on ${stamp} · not legal advice`,
+    left: `${ref} · Draft prepared with Saboot ${opts.appVersion} on ${stamp} · not legal advice`,
     right: `Page ${n} of ${total}`,
   }));
 }

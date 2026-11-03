@@ -1,0 +1,75 @@
+# Publishes a GitHub release when a version tag (vX.Y.Z) is pushed.
+# The release notes come from that version's section in CHANGELOG.md, and
+# every asset is listed in SHA256SUMS and carries a build provenance
+# attestation, so anyone can check the bundle they downloaded.
+name: Release
+
+on:
+  push:
+    tags: ["v*.*.*"]
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write # create the release
+      id-token: write # sign the provenance attestation
+      attestations: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Tag matches package.json
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          pkg="$(node -p "require('./package.json').version")"
+          if [ "$tag" != "$pkg" ]; then
+            echo "Tag v$tag does not match package.json version $pkg" >&2
+            exit 1
+          fi
+
+      - name: Lint, type-check and unit tests
+        run: |
+          npm run lint
+          npx tsc --noEmit -p tsconfig.json
+          npx vitest run
+
+      - name: Build the web app (site root)
+        run: npx vite build
+
+      - name: Package release assets
+        run: |
+          version="${GITHUB_REF_NAME}"
+          mkdir -p release
+          (cd dist && zip -qr "../release/saboot-${version}-web.zip" .)
+          cp docs/images/demo-certificate.pdf "release/saboot-${version}-sample-certificate.pdf"
+          cp docs/images/demo-transcript.pdf "release/saboot-${version}-sample-transcript.pdf"
+          (cd release && sha256sum * > SHA256SUMS && cat SHA256SUMS)
+          node scripts/release-notes.mjs "$version" > release-notes.md
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: release/*
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" release/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "Saboot $GITHUB_REF_NAME" \
+            --notes-file release-notes.md \
+            --verify-tag

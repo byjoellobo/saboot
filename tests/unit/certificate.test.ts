@@ -8,7 +8,7 @@ import { clockOffsetSeconds, describeClock, describeIdentifiers } from "../../sr
 import { istStamp } from "../../src/engine/util/format";
 import { dvr, nodeFontLoader, phone, sampleCase } from "./fixtures";
 
-const OUT = process.env.SAKSHYA_PDF_OUT;
+const OUT = process.env.SABOOT_PDF_OUT;
 
 describe("certificate bundle PDF", () => {
   it("builds a multi-device bundle that pdf-lib can re-open", async () => {

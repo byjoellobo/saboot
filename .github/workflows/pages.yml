@@ -2,7 +2,7 @@
 # GitHub Pages on every push to main. Enable it once in the repository:
 # Settings > Pages > Build and deployment > Source: GitHub Actions.
 #
-# With a custom domain, set the repository variable SAKSHYA_BASE to "/".
+# With a custom domain, set the repository variable SABOOT_BASE to "/".
 name: Deploy to GitHub Pages
 
 on:
@@ -32,7 +32,7 @@ jobs:
       # Uses the committed, CI-checked wasm; no Rust toolchain needed here.
       - run: npx vite build
         env:
-          SAKSHYA_BASE: ${{ vars.SAKSHYA_BASE || format('/{0}/', github.event.repository.name) }}
+          SABOOT_BASE: ${{ vars.SABOOT_BASE || format('/{0}/', github.event.repository.name) }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

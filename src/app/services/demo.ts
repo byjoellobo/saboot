@@ -74,12 +74,12 @@ function demoDevice(): Device {
     nickname: "Asha's phone (demo)",
     makeModel: "Example Phone X1 (demo)",
     color: "Blue",
-    serial: "DEMO0000001",
+    serial: "X1-2026-000184",
     identifiers: [
-      { type: "IMEI", value: "490154203237518", note: "SIM 1 (example number, not a real phone)" },
-      { type: "MAC", value: "00:00:5E:00:53:01", note: "Wi-Fi (documentation address, not a real device)" },
+      { type: "IMEI", value: "490154203237518", note: "SIM 1, example number, not a real phone" },
+      { type: "MAC", value: "00:00:5E:00:53:01", note: "Wi-Fi, documentation address, not a real device" },
     ],
-    otherInfo: "Demo device for trying Sakshya Kit. Not a real phone.",
+    otherInfo: "Demo device for trying Saboot. Not a real phone.",
     relation: { ...emptyRelation(), owned: true, operated: true },
     clock: null,
   };

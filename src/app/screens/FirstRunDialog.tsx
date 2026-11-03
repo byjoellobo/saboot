@@ -15,8 +15,8 @@ export function FirstRunDialog({ onAccept }: { onAccept: () => void }) {
       <div className="sheet">
         <h2 id="first-run-title">Before you start</h2>
         <p>
-          Sakshya Kit helps you prepare the certificate that courts ask for with electronic evidence (WhatsApp chats, screenshots,
-          recordings, CCTV footage) under section 63(4) of the Bharatiya Sakshya Adhiniyam, 2023.
+          Saboot helps you prepare the certificate that courts ask for with electronic evidence (WhatsApp chats, screenshots, recordings,
+          CCTV footage) under section 63(4) of the Bharatiya Sakshya Adhiniyam, 2023.
         </p>
         <ul>
           <li>
@@ -28,7 +28,7 @@ export function FirstRunDialog({ onAccept }: { onAccept: () => void }) {
           </li>
           <li>
             <strong>This tool is not the expert.</strong> Part B of the certificate must be completed and signed by an expert who checks the
-            records independently. Sakshya Kit only prepares a draft for them.
+            records independently. Saboot only prepares a draft for them.
           </li>
         </ul>
         <Check label="I understand these limits" checked={agree} onChange={setAgree} />

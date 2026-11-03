@@ -85,20 +85,28 @@ export function VerifyApp() {
     }
   };
 
+  const compareTitle = payload ? `Records listed for ${payload.caseRef}` : "What to compare against";
+
   return (
     <>
       <header className="topbar">
         <a className="brand" href="./">
-          <img src={`${import.meta.env.BASE_URL}logo.svg`} alt="" width={34} height={34} />
-          <span>Sakshya Kit: check a file</span>
+          <img src={`${import.meta.env.BASE_URL}logo.svg`} alt="" width={36} height={36} />
+          <span>
+            <span className="brand-name">Saboot</span>
+            <span className="brand-tag">Check a file against a hash report</span>
+          </span>
         </a>
+        <nav className="topnav" aria-label="Main">
+          <a href="./">Open Saboot</a>
+        </nav>
       </header>
       <main className="desk" id="main">
-        <section className="sheet">
-          <h1>Check a file against a hash report</h1>
+        <section className="sheet" aria-labelledby="verify-title">
+          <h1 id="verify-title">Check a file against a hash report</h1>
           <p className="lede">
-            Choose a file to see whether it is bit-for-bit identical to a record listed in a Sakshya Kit certificate. The file is read on
-            this device only. It is never uploaded.
+            Choose a file to see whether it is bit-for-bit identical to a record listed in a Saboot certificate. The file is read on this
+            device only. It is never uploaded.
           </p>
 
           {error && (
@@ -107,76 +115,14 @@ export function VerifyApp() {
             </Notice>
           )}
 
-          {payload && (
-            <>
-              <Notice title="Where this list comes from">
-                {payload.source === "link" ? (
-                  <p>
-                    The records below were written into the link or QR code you opened, on the page at <code>{window.location.host}</code>.
-                    The link itself is not signed: compare these values with the printed hash report before relying on a match.
-                  </p>
-                ) : (
-                  <p>
-                    The records below come from the {payload.source} you chose on this device. Compare them with the printed hash report
-                    before relying on a match.
-                  </p>
-                )}
-              </Notice>
-              <p>
-                Records listed for <strong>{payload.caseRef}</strong>:
-              </p>
-              <ul className="record-list">
-                {payload.items.map((i) => (
-                  <li key={i.label + i.sha256} className="record">
-                    <div className="record-head">
-                      <Stamp>{i.label}</Stamp>
-                      <span className="name">{i.name}</span>
-                      {i.size !== UNKNOWN_SIZE && <span className="small">{shortSize(i.size)}</span>}
-                    </div>
-                    <div className="hash">
-                      <span className="alg">SHA-256</span>
-                      <span className="value">{groupHex(i.sha256)}</span>
-                      <span />
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
-
-          <div className="actions">
-            <button type="button" className="btn secondary" onClick={() => listInput.current?.click()}>
-              {payload ? "Load a different hash list" : "Load a hash list or case backup"}
-            </button>
-            <input
-              ref={listInput}
-              type="file"
-              accept=".txt,.sha256,.json,text/plain,application/json"
-              hidden
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (f) void loadList(f);
-                e.target.value = "";
-              }}
-            />
-          </div>
-
-          {!payload && (
-            <TextField
-              label="Expected hash value (SHA-256, SHA-1 or MD5)"
-              value={manual}
-              onChange={setManual}
-              mono
-              hint="Copy it from the hash report. Spaces are ignored."
-            />
-          )}
-
           <DropZone onFiles={check} title="Choose files to check" detail="Large video files can take a few minutes. Nothing is uploaded." />
 
           {checked.map((c) => (
-            <div key={c.key} className="record" aria-live="polite">
+            <div key={c.key} className="record">
               <div className="record-head">
-                <span className="name">{c.name}</span>
+                <span className="name" style={{ gridColumn: "1 / 3" }}>
+                  {c.name}
+                </span>
                 <span className="small">{formatBytes(c.size)}</span>
               </div>
               {!c.digests && !c.error && (
@@ -201,7 +147,7 @@ export function VerifyApp() {
               )}
               {c.outcome?.kind === "no-match" && (
                 <Notice tone="warn" title="No match">
-                  This file does not match {payload ? "any record listed in this link" : "the hash value entered"}.
+                  This file does not match {payload ? "any record listed below" : "the hash value entered"}.
                 </Notice>
               )}
               {c.digests && (
@@ -220,9 +166,77 @@ export function VerifyApp() {
             </div>
           ))}
 
-          <MessageCheck />
+          <section className="output" aria-labelledby="compare-title">
+            <h2 id="compare-title">{compareTitle}</h2>
+            {payload ? (
+              <>
+                <Notice title="Where this list comes from">
+                  {payload.source === "link" ? (
+                    <p>
+                      These records were written into the link or QR code you opened, on the page at <code>{window.location.host}</code>.
+                      The link itself is not signed: compare these values with the printed hash report before relying on a match.
+                    </p>
+                  ) : (
+                    <p>
+                      These records come from the {payload.source} you chose on this device. Compare them with the printed hash report
+                      before relying on a match.
+                    </p>
+                  )}
+                </Notice>
+                <ul className="record-list">
+                  {payload.items.map((i) => (
+                    <li key={i.label + i.sha256} className="record">
+                      <div className="record-head">
+                        <Stamp>{i.label}</Stamp>
+                        <span className="name">{i.name}</span>
+                        {i.size !== UNKNOWN_SIZE ? <span className="small">{shortSize(i.size)}</span> : <span />}
+                      </div>
+                      <div className="hash">
+                        <span className="alg">SHA-256</span>
+                        <span className="value">{groupHex(i.sha256)}</span>
+                        <span />
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ) : (
+              <>
+                <p>
+                  Scanning a QR code from a Saboot hash report fills this in automatically. Otherwise, load the case's{" "}
+                  <code>SHA256SUMS</code> file or backup, or paste one hash value.
+                </p>
+                <TextField
+                  label="Expected hash value (SHA-256, SHA-1 or MD5)"
+                  value={manual}
+                  onChange={setManual}
+                  mono
+                  hint="Copy it from the hash report. Spaces are ignored."
+                />
+              </>
+            )}
+            <div className="actions">
+              <button type="button" className="btn secondary" onClick={() => listInput.current?.click()}>
+                {payload ? "Load a different hash list" : "Load a hash list or case backup"}
+              </button>
+              <input
+                ref={listInput}
+                type="file"
+                accept=".txt,.sha256,.json,text/plain,application/json"
+                hidden
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) void loadList(f);
+                  e.target.value = "";
+                }}
+              />
+            </div>
+          </section>
+        </section>
 
-          <p className="small">
+        <section className="sheet">
+          <MessageCheck />
+          <p className="small" style={{ marginTop: "1.6rem" }}>
             A match shows the file is the same one that was hashed. It does not show whether what the file contains is true, and this page
             is not legal advice.
           </p>

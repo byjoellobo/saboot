@@ -14,12 +14,12 @@ function DeleteAllData() {
           className="btn danger"
           onClick={async () => {
             const sure = window.confirm(
-              "Delete every case, hash value, custody log and chat text stored by Sakshya Kit in this browser? This cannot be undone. Download backups first if you need them. Your original files are not affected.",
+              "Delete every case, hash value, custody log and chat text stored by Saboot in this browser? This cannot be undone. Download backups first if you need them. Your original files are not affected.",
             );
             if (!sure) return;
             try {
               await deleteAllData();
-              setStatus({ tone: "ok", text: "All Sakshya Kit data on this device has been deleted." });
+              setStatus({ tone: "ok", text: "All Saboot data on this device has been deleted." });
             } catch (e) {
               setStatus({ tone: "warn", text: e instanceof Error ? e.message : "Could not delete the data." });
             }
@@ -119,7 +119,7 @@ export function LearnScreen() {
           "bears most heavily on the party who does not control the device that produced the record".
         </p>
 
-        <h2>What Sakshya Kit does, and does not do</h2>
+        <h2>What Saboot does, and does not do</h2>
         <ul>
           <li>It reads and hashes your files on your own device (SHA-256, SHA-1 and MD5 in one pass). Nothing is uploaded.</li>
           <li>It guides you to the identifiers of your phone, computer or CCTV recorder, and checks them for typing mistakes.</li>
@@ -147,8 +147,8 @@ export function LearnScreen() {
           .
         </p>
         <p>
-          To use Sakshya Kit without internet, install it: on Android or a computer, use "Install app" at the top (or the browser menu); on
-          an iPhone, open it in Safari and choose Share, then Add to Home Screen.
+          To use Saboot without internet, install it: on Android or a computer, use "Install app" at the top (or the browser menu); on an
+          iPhone, open it in Safari and choose Share, then Add to Home Screen.
         </p>
         <DeleteAllData />
 

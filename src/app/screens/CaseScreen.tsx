@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import type { CaseFile } from "../../sakshya/model";
+import { Icon } from "../components/icons";
 import { Notice } from "../components/ui";
 import { href, type Step } from "../router";
 import { caseDisplayName } from "../state/case-ops";
@@ -28,7 +29,7 @@ export function CaseScreen({ id, step }: { id: string; step: Step }) {
   const caseName = caseFile ? caseDisplayName(caseFile) : "";
 
   useEffect(() => {
-    if (caseName) document.title = `${stepTitle}: ${caseName} (Sakshya Kit)`;
+    if (caseName) document.title = `${stepTitle}: ${caseName} (Saboot)`;
   }, [stepTitle, caseName]);
 
   // Move focus to the step heading only when the step changes (never while typing).
@@ -56,34 +57,40 @@ export function CaseScreen({ id, step }: { id: string; step: Step }) {
 
   return (
     <div className="case-file">
-      <nav className="index-tabs" aria-label="Case steps">
-        {TABS.map((t, i) => (
-          <a
-            key={t.step}
-            className="index-tab"
-            href={href({ name: "case", id, step: t.step })}
-            aria-current={t.step === step ? "step" : undefined}
-          >
-            {t.step !== "log" && <span className="num">{i + 1}</span>}
-            <span>{t.title}</span>
-            {t.step === "records" && ingest.jobs.length > 0 && <span className="small">(hashing {ingest.jobs.length})</span>}
-            {t.done(caseFile) && (
-              <span className="tick">
-                ✓<span className="visually-hidden"> done</span>
-              </span>
-            )}
-          </a>
-        ))}
-      </nav>
+      <div className="file-side">
+        <p className="file-label">
+          <span className="small">Case file</span>
+          <strong>{caseDisplayName(caseFile)}</strong>
+        </p>
+        <nav className="index-tabs" aria-label="Case steps">
+          {TABS.map((t, i) => (
+            <a
+              key={t.step}
+              className="index-tab"
+              href={href({ name: "case", id, step: t.step })}
+              aria-current={t.step === step ? "step" : undefined}
+            >
+              {t.step !== "log" && <span className="num">{i + 1}</span>}
+              <span>{t.title}</span>
+              {t.step === "records" && ingest.jobs.length > 0 ? (
+                <span className="working">hashing {ingest.jobs.length}</span>
+              ) : (
+                t.done(caseFile) && (
+                  <span className="tick">
+                    <Icon name="check" size={16} label="done" />
+                  </span>
+                )
+              )}
+            </a>
+          ))}
+        </nav>
+      </div>
       <section className="sheet" aria-labelledby="step-title">
         {saveError && (
           <Notice tone="warn" title="Not saved">
             {saveError}
           </Notice>
         )}
-        <p className="small" style={{ marginBottom: "0.3rem" }}>
-          {caseDisplayName(caseFile)}
-        </p>
         {step === "details" && <DetailsStep handle={handle} caseFile={caseFile} />}
         {step === "records" && <RecordsStep handle={handle} caseFile={caseFile} ingest={ingest} />}
         {step === "devices" && <DevicesStep handle={handle} caseFile={caseFile} />}

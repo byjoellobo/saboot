@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use or refer to Saboot in research, teaching or legal-aid work, please cite it as below."
+title: "Saboot: offline helper for the section 63(4) Bharatiya Sakshya Adhiniyam electronic evidence certificate"
+type: software
+authors:
+  - alias: byjoellobo
+version: 0.3.0
+date-released: 2026-11-04
+license: AGPL-3.0-or-later
+repository-code: "https://github.com/byjoellobo/saboot"
+url: "https://byjoellobo.github.io/saboot/"
+abstract: >-
+  Saboot is an offline-first web app that hashes electronic evidence (WhatsApp
+  chat exports, screenshots, call recordings and CCTV footage) on the user's own
+  device, guides them to the identifiers of the source device, and drafts the
+  certificate required by section 63(4) of the Bharatiya Sakshya Adhiniyam,
+  2023, with a hash report, QR verification and a per-message hashed WhatsApp
+  transcript. It is not legal advice.
+keywords:
+  - electronic evidence
+  - Bharatiya Sakshya Adhiniyam
+  - section 63
+  - hash
+  - SHA-256
+  - WhatsApp
+  - access to justice
+  - India

@@ -37,7 +37,7 @@ interface ExportedBackup extends Omit<Backup, "caseFile"> {
 export async function exportBackup(c: CaseFile): Promise<Uint8Array> {
   const chats = await listChatBytes(c.id);
   const backup: ExportedBackup = {
-    format: "sakshya-kit-backup",
+    format: "saboot-backup",
     version: 1,
     exportedAt: new Date().toISOString(),
     appVersion: APP_VERSION,
@@ -60,12 +60,12 @@ function remapIds(c: CaseFile): { caseFile: CaseFile; idMap: ReadonlyMap<string,
 
 /** Validate a backup completely, then store it in one transaction. Returns the stored case. */
 export async function importBackup(file: File): Promise<CaseFile> {
-  if (file.size > MAX_BACKUP_BYTES) throw new Error("This file is too large to be a Sakshya Kit backup.");
+  if (file.size > MAX_BACKUP_BYTES) throw new Error("This file is too large to be a Saboot backup.");
   let raw: unknown;
   try {
     raw = JSON.parse(await file.text());
   } catch {
-    throw new Error("This is not a Sakshya Kit backup (it is not valid JSON).");
+    throw new Error("This is not a Saboot backup (it is not valid JSON).");
   }
   const parsed = backupSchema.safeParse(raw);
   if (!parsed.success) {

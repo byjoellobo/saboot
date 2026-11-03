@@ -1,6 +1,7 @@
 import { useId, useRef, useState, type ChangeEvent, type DragEvent, type ReactNode } from "react";
 import { groupHex } from "../../engine/util/format";
 import { announce } from "./Announcer";
+import { Icon, type IconName } from "./icons";
 
 export function Stamp({ children, big = false }: { children: ReactNode; big?: boolean }) {
   return <span className={big ? "stamp big" : "stamp"}>{children}</span>;
@@ -17,16 +18,20 @@ export function Notice({
   level = 3,
   children,
 }: {
-  tone?: "info" | "warn" | "ok";
+  tone?: "info" | "warn" | "ok" | "quiet";
   title?: string;
   level?: 2 | 3;
   children: ReactNode;
 }) {
   const Heading = level === 2 ? "h2" : "h3";
+  const icon: IconName = tone === "warn" || tone === "quiet" ? "alert" : tone === "ok" ? "check" : "info";
   return (
     <div className={tone === "info" ? "notice" : `notice ${tone}`} role={tone === "warn" ? "alert" : undefined}>
-      {title && <Heading className="notice-title">{title}</Heading>}
-      {children}
+      <Icon name={icon} />
+      <div className="notice-body">
+        {title && <Heading className="notice-title">{title}</Heading>}
+        {children}
+      </div>
     </div>
   );
 }
@@ -244,6 +249,7 @@ export function DropZone({
         take(e.dataTransfer.files);
       }}
     >
+      <Icon name="upload" size={28} />
       <strong>{title}</strong>
       <small id={detailId}>{detail}</small>
       <input

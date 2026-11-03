@@ -1,7 +1,8 @@
 import { useEffect, useState, type ReactElement } from "react";
 import { Announcer } from "./components/Announcer";
 import { useInstallPrompt } from "./components/install";
-import { getSetting, requestPersistence, setSetting } from "./state/db";
+import { getSetting, setSetting } from "./state/db";
+import { PRIVACY_URL, RELEASES_URL, REPO_URL } from "./links";
 import { useRoute } from "./router";
 import { HomeScreen } from "./screens/HomeScreen";
 import { CaseScreen } from "./screens/CaseScreen";
@@ -19,12 +20,10 @@ export function App({ needRefresh, onRefresh, offlineReady }: AppProps): ReactEl
   const route = useRoute();
   const [acknowledged, setAcknowledged] = useState<boolean | null>(null);
   const [showOfflineNote, setShowOfflineNote] = useState(false);
-  const [persisted, setPersisted] = useState<boolean | null>(null);
   const install = useInstallPrompt();
 
   useEffect(() => {
     getSetting("acknowledged-v1", false).then(setAcknowledged, () => setAcknowledged(false));
-    requestPersistence().then(setPersisted, () => setPersisted(false));
   }, []);
 
   useEffect(() => {
@@ -50,8 +49,11 @@ export function App({ needRefresh, onRefresh, offlineReady }: AppProps): ReactEl
       <Announcer />
       <header className="topbar">
         <a className="brand" href="#/">
-          <img src={`${import.meta.env.BASE_URL}logo.svg`} alt="" width={34} height={34} />
-          <span>Sakshya Kit</span>
+          <img src={`${import.meta.env.BASE_URL}logo.svg`} alt="" width={36} height={36} />
+          <span>
+            <span className="brand-name">Saboot</span>
+            <span className="brand-tag">Electronic evidence, hashed on your own device</span>
+          </span>
         </a>
         <nav className="topnav" aria-label="Main">
           <a href="#/" aria-current={route.name === "home" ? "page" : undefined}>
@@ -70,20 +72,27 @@ export function App({ needRefresh, onRefresh, offlineReady }: AppProps): ReactEl
       </header>
 
       <main className="desk" id="main" tabIndex={-1}>
-        {persisted === false && (route.name === "home" || (route.name === "case" && route.step === "generate")) && (
-          <div className="notice warn" role="note">
-            This browser has not promised to keep Sakshya Kit's data, so it may clear your cases if the device runs low on space. Download a
-            backup of each case from its Generate step.
-          </div>
-        )}
         {route.name === "home" && <HomeScreen />}
         {route.name === "learn" && <LearnScreen />}
         {route.name === "case" && <CaseScreen key={route.id} id={route.id} step={route.step} />}
       </main>
 
       <footer className="foot">
-        Sakshya Kit {APP_VERSION}. Your files stay on this device. This is a software tool, not legal advice and not an expert.{" "}
-        <a href="#/learn">Read the limits</a>.
+        <p>
+          Saboot {APP_VERSION}. Your files stay on this device. Saboot is a software tool: it is not legal advice and it is not the expert
+          who signs Part B. <a href="#/learn">Read the limits</a>.
+        </p>
+        <nav aria-label="Project">
+          <a href={PRIVACY_URL} target="_blank" rel="noreferrer noopener">
+            Privacy
+          </a>
+          <a href={REPO_URL} target="_blank" rel="noreferrer noopener">
+            Source code (AGPL-3.0)
+          </a>
+          <a href={RELEASES_URL} target="_blank" rel="noreferrer noopener">
+            Releases
+          </a>
+        </nav>
       </footer>
 
       {acknowledged === false && (
@@ -97,7 +106,7 @@ export function App({ needRefresh, onRefresh, offlineReady }: AppProps): ReactEl
 
       {needRefresh && (
         <div className="banner" role="status">
-          <span>A new version of Sakshya Kit is ready.</span>
+          <span>A new version of Saboot is ready.</span>
           <button type="button" className="btn" onClick={onRefresh}>
             Reload to update
           </button>
@@ -105,7 +114,7 @@ export function App({ needRefresh, onRefresh, offlineReady }: AppProps): ReactEl
       )}
       {!needRefresh && showOfflineNote && (
         <div className="banner" role="status">
-          <span>Sakshya Kit now works without internet on this device.</span>
+          <span>Saboot now works without internet on this device.</span>
           <button type="button" className="btn" onClick={() => setShowOfflineNote(false)}>
             OK
           </button>

@@ -1,0 +1,7 @@
+# Every change is reviewed by the maintainer. Statutory text, the hasher and
+# the release pipeline get extra care; see CONTRIBUTING.md.
+*                                       @byjoellobo
+/src/sakshya/certificate/schedule.ts    @byjoellobo
+/crates/                                @byjoellobo
+/src/engine/hash/                       @byjoellobo
+/.github/workflows/                     @byjoellobo

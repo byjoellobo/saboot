@@ -1,4 +1,4 @@
-//! Streaming multi-algorithm hasher for Sakshya Kit.
+//! Streaming multi-algorithm hasher for Saboot.
 //!
 //! A single pass over the input updates MD5, SHA-1, SHA-256 and CRC32 at the
 //! same time, so very large files (multi-gigabyte CCTV exports) are read once.

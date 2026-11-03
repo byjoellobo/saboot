@@ -1,4 +1,4 @@
-// Thin, dependency-free bridge to the Rust hasher (crates/sakshya-hash).
+// Thin, dependency-free bridge to the Rust hasher (crates/saboot-hash).
 // Works in browsers, workers and Node (tests) because it only needs the raw
 // wasm bytes or a compiled WebAssembly.Module.
 

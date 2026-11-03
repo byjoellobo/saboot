@@ -139,7 +139,7 @@ test("works offline after the first visit", async ({ page, context }) => {
   await page.waitForFunction(() => navigator.serviceWorker.controller !== null);
   await context.setOffline(true);
   await page.reload();
-  await expect(page.getByRole("link", { name: "Sakshya Kit" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Saboot" })).toBeVisible();
   await page.goto("/verify.html");
   await expect(page.getByRole("heading", { name: "Check a file against a hash report" })).toBeVisible();
   await context.setOffline(false);

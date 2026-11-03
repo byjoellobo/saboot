@@ -11,9 +11,9 @@ import { fileURLToPath } from "node:url";
 import { runCargo } from "./cargo.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const manifest = join(root, "crates", "sakshya-hash", "Cargo.toml");
-const built = join(root, "crates", "sakshya-hash", "target", "wasm32-unknown-unknown", "release", "sakshya_hash.wasm");
-const committed = join(root, "src", "engine", "hash", "sakshya_hash.wasm");
+const manifest = join(root, "crates", "saboot-hash", "Cargo.toml");
+const built = join(root, "crates", "saboot-hash", "target", "wasm32-unknown-unknown", "release", "saboot_hash.wasm");
+const committed = join(root, "src", "engine", "hash", "saboot_hash.wasm");
 
 function normalise(bytes) {
   return Buffer.from(bytes.map((b) => (b === 0x5c ? 0x2f : b)));

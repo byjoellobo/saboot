@@ -6,6 +6,7 @@ import { clockOffsetSeconds, describeClock } from "../../../sakshya/devices/desc
 import { GUIDE_ORDER, GUIDES } from "../../../sakshya/devices/guides";
 import { checkEid, checkImei, checkMac, checkSerial, type IdCheck } from "../../../sakshya/devices/validate";
 import { emptyRelation, type Device, type DeviceIdentifier, type DeviceProfile, type IdentifierType } from "../../../sakshya/model";
+import { Icon } from "../../components/icons";
 import { Check, Notice, SelectField, TextField } from "../../components/ui";
 import { DeviceGuidePanel } from "./DeviceGuidePanel";
 
@@ -82,6 +83,7 @@ export function DeviceEditor({ initial, onSave, onCancel }: DeviceEditorProps) {
         <div className="profiles">
           {GUIDE_ORDER.map((p) => (
             <button key={p} type="button" className="profile" aria-pressed={false} onClick={() => setDevice(blankDevice(p))}>
+              <Icon name={p === "cloud" ? "source" : p === "disc" || p === "other" ? "file" : "device"} />
               {GUIDES[p].title}
             </button>
           ))}
@@ -185,7 +187,7 @@ export function DeviceEditor({ initial, onSave, onCancel }: DeviceEditorProps) {
                 <TextField label="Note" value={x.note} onChange={(v) => setId(i, { note: v })} placeholder="e.g. SIM 1, Wi-Fi" />
                 <button
                   type="button"
-                  className="btn link"
+                  className="btn link remove"
                   aria-label={`Remove identifier ${i + 1}`}
                   onClick={() => set({ identifiers: device.identifiers.filter((_, j) => j !== i) })}
                 >
@@ -194,11 +196,8 @@ export function DeviceEditor({ initial, onSave, onCancel }: DeviceEditorProps) {
               </div>
               {check && check.message && (
                 <p
-                  className={`small`}
-                  style={{
-                    color: check.severity === "ok" ? "var(--ok)" : check.severity === "error" ? "var(--tape)" : "#8a4b00",
-                    marginTop: "-0.4rem",
-                  }}
+                  className="id-check"
+                  style={{ color: check.severity === "ok" ? "var(--ok)" : check.severity === "error" ? "var(--tape)" : "var(--amber)" }}
                 >
                   {check.message}
                 </p>

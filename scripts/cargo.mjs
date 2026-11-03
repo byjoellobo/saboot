@@ -5,7 +5,7 @@
 // Build Tools have no MSVC `link.exe`; rustup's GNU toolchain ships its own
 // MinGW linker, so we fall back to it when it is installed.
 //
-// Override with SAKSHYA_RUST_TOOLCHAIN=<toolchain> (e.g. "stable").
+// Override with SABOOT_RUST_TOOLCHAIN=<toolchain> (e.g. "stable").
 import { execFileSync, spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { homedir } from "node:os";
@@ -28,10 +28,10 @@ function hasMsvcLinker() {
   return probe.status === 0 && /Microsoft Visual Studio|VC\\Tools/i.test(probe.stdout);
 }
 
-/** The Rust version pinned in crates/sakshya-hash/rust-toolchain.toml. */
+/** The Rust version pinned in crates/saboot-hash/rust-toolchain.toml. */
 export function pinnedChannel() {
   try {
-    const toml = readFileSync(join(root, "crates", "sakshya-hash", "rust-toolchain.toml"), "utf8");
+    const toml = readFileSync(join(root, "crates", "saboot-hash", "rust-toolchain.toml"), "utf8");
     return toml.match(/^channel\s*=\s*"([^"]+)"/m)?.[1] ?? null;
   } catch {
     return null;
@@ -39,7 +39,7 @@ export function pinnedChannel() {
 }
 
 export function pickToolchain() {
-  if (process.env.SAKSHYA_RUST_TOOLCHAIN) return process.env.SAKSHYA_RUST_TOOLCHAIN;
+  if (process.env.SABOOT_RUST_TOOLCHAIN) return process.env.SABOOT_RUST_TOOLCHAIN;
   if (process.platform !== "win32" || hasMsvcLinker()) return null;
   const names = installedToolchains()
     .split(/\r?\n/)
@@ -68,7 +68,7 @@ export function remapFlags() {
   return [
     `--remap-path-prefix=${join(cargoHome, "registry", "src")}=/crates`,
     `--remap-path-prefix=${join(cargoHome, "git", "checkouts")}=/git`,
-    `--remap-path-prefix=${root}=/sakshya-kit`,
+    `--remap-path-prefix=${root}=/saboot`,
   ];
 }
 
@@ -83,8 +83,8 @@ export function runCargo(args, options = {}) {
     env.CARGO_ENCODED_RUSTFLAGS = remapFlags().join("\x1f");
     delete env.RUSTFLAGS;
   }
-  // Run inside the crate so rustup honours crates/sakshya-hash/rust-toolchain.toml.
-  const cwd = givenCwd ?? join(root, "crates", "sakshya-hash");
+  // Run inside the crate so rustup honours crates/saboot-hash/rust-toolchain.toml.
+  const cwd = givenCwd ?? join(root, "crates", "saboot-hash");
   const result = spawnSync("cargo", fullArgs, { stdio: "inherit", ...spawnOptions, cwd, env });
   if (result.error) throw result.error;
   if (result.status !== 0) {

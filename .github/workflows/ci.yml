@@ -77,22 +77,22 @@ jobs:
           targets: wasm32-unknown-unknown
           components: clippy
 
-      # crates/sakshya-hash/rust-toolchain.toml pins the compiler, because the
+      # crates/saboot-hash/rust-toolchain.toml pins the compiler, because the
       # committed wasm is compared byte for byte. rustup only reads that file
       # when cargo runs inside the crate folder, so install the pinned
       # toolchain here and run every cargo command from that folder.
       - name: Install pinned Rust toolchain
-        working-directory: crates/sakshya-hash
+        working-directory: crates/saboot-hash
         run: |
           rustup toolchain install
           rustc --version
 
       - name: Rust tests
-        working-directory: crates/sakshya-hash
+        working-directory: crates/saboot-hash
         run: cargo test --locked --manifest-path Cargo.toml
 
       - name: Clippy
-        working-directory: crates/sakshya-hash
+        working-directory: crates/saboot-hash
         run: cargo clippy --locked --all-targets --manifest-path Cargo.toml -- -D warnings
 
       - uses: actions/setup-node@v4
@@ -104,3 +104,14 @@ jobs:
 
       - name: Committed wasm matches the Rust source
         run: npm run wasm:check
+
+      # If the check fails, the freshly built binary is kept so a maintainer
+      # can inspect it (and, after review, commit it).
+      - name: Upload rebuilt wasm
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rebuilt-wasm
+          path: crates/saboot-hash/target/wasm32-unknown-unknown/release/saboot_hash.wasm
+          if-no-files-found: ignore
+          retention-days: 14

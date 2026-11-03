@@ -1,10 +1,10 @@
 # Architecture
 
-This document is for contributors. It explains how Sakshya Kit is put together, how a file travels from the moment it is dropped on the page to the printed certificate, and why the main design decisions were made. For setup and rules, see [CONTRIBUTING.md](../CONTRIBUTING.md). For the security view, see [SECURITY.md](../SECURITY.md).
+This document is for contributors. It explains how Saboot is put together, how a file travels from the moment it is dropped on the page to the printed certificate, and why the main design decisions were made. For setup and rules, see [CONTRIBUTING.md](../CONTRIBUTING.md). For the security view, see [SECURITY.md](../SECURITY.md).
 
 ## The big picture
 
-Sakshya Kit is a static web app (React + TypeScript, built with Vite) that runs entirely in the browser. There is no backend. Everything a user enters is stored in the browser's IndexedDB, and every file is read and hashed on the device. A Progressive Web App service worker (Workbox, through `vite-plugin-pwa`) precaches the app, the hasher and the fonts, so after the first visit it works offline.
+Saboot is a static web app (React + TypeScript, built with Vite) that runs entirely in the browser. There is no backend. Everything a user enters is stored in the browser's IndexedDB, and every file is read and hashed on the device. A Progressive Web App service worker (Workbox, through `vite-plugin-pwa`) precaches the app, the hasher and the fonts, so after the first visit it works offline.
 
 The build produces two pages:
 
@@ -44,21 +44,21 @@ The build produces two pages:
                                  |  WebAssembly.instantiate, C ABI
                                  v
                +-----------------------------------+
-               | crates/sakshya-hash (Rust)        |
+               | crates/saboot-hash (Rust)        |
                | MD5 + SHA-1 + SHA-256 + CRC32     |
-               | -> src/engine/hash/sakshya_hash.wasm (committed) |
+               | -> src/engine/hash/saboot_hash.wasm (committed) |
                +-----------------------------------+
 ```
 
 Imports only point downwards. `engine` never imports `sakshya` or `app`, and `sakshya` never imports `app`. `verify` reuses UI components (and the backup schema) from `app` but never touches stored cases.
 
-| Layer                 | Responsibility                                                                             | Key files                                                                                                                                                                                       |
-| --------------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `crates/sakshya-hash` | One-pass MD5, SHA-1, SHA-256 and CRC32 over a byte stream, exposed through a small C ABI   | `src/lib.rs`                                                                                                                                                                                    |
-| `src/engine`          | Evidence primitives any tool could use                                                     | `hash/hash-pool.ts`, `hash/hash.worker.ts`, `hash/wasm-hasher.ts`, `hash/blob-hash.ts`, `zip/zip-reader.ts`, `pdf/writer.ts`, `pdf/fonts.ts`, `custody/custody-log.ts`, `verify/verify-link.ts` |
-| `src/sakshya`         | Everything about the section 63(4) certificate under the Bharatiya Sakshya Adhiniyam, 2023 | `certificate/schedule.ts`, `certificate/certificate-pdf.ts`, `certificate/checks.ts`, `devices/*`, `whatsapp/parse.ts`, `whatsapp/patterns.ts`, `whatsapp/transcript-pdf.ts`, `model.ts`        |
-| `src/app`             | The user interface and everything that touches browser storage or the network              | `screens/*`, `state/db.ts`, `state/use-case.ts`, `state/use-ingest.ts`, `state/case-ops.ts`, `services/*`                                                                                       |
-| `src/verify`          | The check page                                                                             | `VerifyApp.tsx`                                                                                                                                                                                 |
+| Layer                | Responsibility                                                                             | Key files                                                                                                                                                                                       |
+| -------------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `crates/saboot-hash` | One-pass MD5, SHA-1, SHA-256 and CRC32 over a byte stream, exposed through a small C ABI   | `src/lib.rs`                                                                                                                                                                                    |
+| `src/engine`         | Evidence primitives any tool could use                                                     | `hash/hash-pool.ts`, `hash/hash.worker.ts`, `hash/wasm-hasher.ts`, `hash/blob-hash.ts`, `zip/zip-reader.ts`, `pdf/writer.ts`, `pdf/fonts.ts`, `custody/custody-log.ts`, `verify/verify-link.ts` |
+| `src/sakshya`        | Everything about the section 63(4) certificate under the Bharatiya Sakshya Adhiniyam, 2023 | `certificate/schedule.ts`, `certificate/certificate-pdf.ts`, `certificate/checks.ts`, `devices/*`, `whatsapp/parse.ts`, `whatsapp/patterns.ts`, `whatsapp/transcript-pdf.ts`, `model.ts`        |
+| `src/app`            | The user interface and everything that touches browser storage or the network              | `screens/*`, `state/db.ts`, `state/use-case.ts`, `state/use-ingest.ts`, `state/case-ops.ts`, `services/*`                                                                                       |
+| `src/verify`         | The check page                                                                             | `VerifyApp.tsx`                                                                                                                                                                                 |
 
 ## From file drop to certificate
 
@@ -73,7 +73,7 @@ The user drops files on the Records step. `src/app/state/use-ingest.ts` queues t
 
 `HashPool` (`src/engine/hash/hash-pool.ts`) runs up to four module Web Workers (one fewer than the number of CPU cores, at least one). Each worker takes one job at a time; extra jobs wait in a queue. Jobs can be cancelled. If a worker crashes, its job is rejected with an error, the worker is removed, and a new one is started when the next job needs it. The same pool is used by the check page.
 
-Each worker (`hash.worker.ts`) fetches `sakshya_hash.wasm` once and keeps one `HasherModule`. Progress messages are throttled to one every 100 ms.
+Each worker (`hash.worker.ts`) fetches `saboot_hash.wasm` once and keeps one `HasherModule`. Progress messages are throttled to one every 100 ms.
 
 ### 3. Hashing through the wasm ABI
 
@@ -112,7 +112,7 @@ Back in `ingest.ts`, a `.txt` entry becomes the chat text only if its CRC matche
 
 ### 6. Storage and the custody log
 
-`src/app/state/db.ts` uses three IndexedDB object stores in the `sakshya-kit` database:
+`src/app/state/db.ts` uses three IndexedDB object stores in the `saboot` database:
 
 | Store      | Holds                                                                                                      |
 | ---------- | ---------------------------------------------------------------------------------------------------------- |
@@ -176,7 +176,7 @@ The hasher exports a handful of plain C functions and imports nothing. The JavaS
 
 Rust compiled to WebAssembly is used rather than Web Crypto because `crypto.subtle.digest` cannot stream (it needs the whole input in memory) and has no MD5, while the Schedule's hash block offers MD5, SHA-1 and SHA-256. One pass computes all of them, plus the CRC32 needed to check zip entries.
 
-The `.wasm` is committed so that web-only contributors and static hosts do not need Rust. To keep the binary honest, the compiler version is pinned in `crates/sakshya-hash/rust-toolchain.toml`, source paths are remapped out of the binary at build time, and CI rebuilds the module and fails if it differs from the committed file (`npm run wasm:check`).
+The `.wasm` is committed so that web-only contributors and static hosts do not need Rust. To keep the binary honest, the compiler version is pinned in `crates/saboot-hash/rust-toolchain.toml`, source paths are remapped out of the binary at build time, and CI rebuilds the module and fails if it differs from the committed file (`npm run wasm:check`).
 
 ### Reading zips from the central directory
 
@@ -207,7 +207,7 @@ Evidence and case details are sensitive, and the users are often in a dispute wi
 
 ### AGPL-3.0-or-later
 
-Sakshya Kit is delivered as a website, and people trust it with evidence. The GNU Affero General Public License makes sure that anyone who offers a modified version to the public, including as a hosted service, must also offer its complete source code, so users and experts can always inspect what produced their hashes and certificates. The hasher crate is MIT OR Apache-2.0 so that it can be reused anywhere, and the Noto fonts keep their SIL Open Font License.
+Saboot is delivered as a website, and people trust it with evidence. The GNU Affero General Public License makes sure that anyone who offers a modified version to the public, including as a hosted service, must also offer its complete source code, so users and experts can always inspect what produced their hashes and certificates. The hasher crate is MIT OR Apache-2.0 so that it can be reused anywhere, and the Noto fonts keep their SIL Open Font License.
 
 ## Threat model summary
 
@@ -222,11 +222,11 @@ The defences are listed in [SECURITY.md](../SECURITY.md).
 
 The engine was kept free of BSA specifics so that other tools can be built on it. A new tool would add its own domain layer next to `src/sakshya` (for example `src/tenancy`), its own screens, and possibly its own entry page, while reusing `src/engine` as it is.
 
-| Future tool                                                                                                 | Reuses from the engine                                                                                                                                                                         | Needs to add                                                                                                                                                                                                         |
-| ----------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Tenancy move-in record**: a dated photo record that the other party acknowledges                          | `HashPool` for photos and videos; the custody log for when each photo was taken and added; `PdfWriter` for the report; verify links so the other party can check each photo on their own phone | A way to record the other party's acknowledgement, which the unsigned verify link cannot provide (for example a new, generic signing module in the engine); tenancy-specific report text                             |
-| **Gig-worker earnings log**: deductions and deactivation notices checked against state gig-worker law       | Hashing of screenshots and exported statements; the custody log as a dated diary; `PdfWriter` tables; the zip reader for exported archives                                                     | Parsers for platform statements; the rules for the relevant law, in its own domain layer with sources, the same way `src/sakshya` handles the Schedule                                                               |
-| **Broadband outage and speed log**: measurements turned into a complaint against service-quality benchmarks | The custody log (one entry per measurement, with details); `PdfWriter` tables; hashing of any exported files                                                                                   | A measurement component. Measuring needs network access to a test server, so this tool would need its own Content-Security-Policy and its own privacy statement; it must not loosen the policy of Sakshya Kit itself |
+| Future tool                                                                                                 | Reuses from the engine                                                                                                                                                                         | Needs to add                                                                                                                                                                                                    |
+| ----------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Tenancy move-in record**: a dated photo record that the other party acknowledges                          | `HashPool` for photos and videos; the custody log for when each photo was taken and added; `PdfWriter` for the report; verify links so the other party can check each photo on their own phone | A way to record the other party's acknowledgement, which the unsigned verify link cannot provide (for example a new, generic signing module in the engine); tenancy-specific report text                        |
+| **Gig-worker earnings log**: deductions and deactivation notices checked against state gig-worker law       | Hashing of screenshots and exported statements; the custody log as a dated diary; `PdfWriter` tables; the zip reader for exported archives                                                     | Parsers for platform statements; the rules for the relevant law, in its own domain layer with sources, the same way `src/sakshya` handles the Schedule                                                          |
+| **Broadband outage and speed log**: measurements turned into a complaint against service-quality benchmarks | The custody log (one entry per measurement, with details); `PdfWriter` tables; hashing of any exported files                                                                                   | A measurement component. Measuring needs network access to a test server, so this tool would need its own Content-Security-Policy and its own privacy statement; it must not loosen the policy of Saboot itself |
 
 Guidelines for such work:
 

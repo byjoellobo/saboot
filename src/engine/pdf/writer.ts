@@ -89,8 +89,8 @@ export class PdfWriter {
     const when = opts.createdAt ?? new Date();
     doc.setTitle(opts.title, { showInWindowTitleBar: true });
     doc.setSubject(opts.subject);
-    doc.setCreator("Sakshya Kit");
-    doc.setProducer("Sakshya Kit (pdf-lib)");
+    doc.setCreator("Saboot");
+    doc.setProducer("Saboot (pdf-lib)");
     doc.setKeywords([...(opts.keywords ?? [])]);
     doc.setCreationDate(when);
     doc.setModificationDate(when);

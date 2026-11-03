@@ -1,6 +1,6 @@
 # Security policy
 
-Sakshya Kit helps people prepare evidence for court. A bug that shows a wrong hash, attributes a message to the wrong person, or leaks case details can do real harm, so we treat these as security issues even when no "attacker" is involved.
+Saboot helps people prepare evidence for court. A bug that shows a wrong hash, attributes a message to the wrong person, or leaks case details can do real harm, so we treat these as security issues even when no "attacker" is involved.
 
 ## Supported versions
 
@@ -24,7 +24,7 @@ If private reporting is not available, use the contact method on a maintainer's 
 
 Please include:
 
-- the Sakshya Kit version (shown at the bottom of the app) or commit, the browser and its version, and the operating system;
+- the Saboot version (shown at the bottom of the app) or commit, the browser and its version, and the operating system;
 - what an attacker can do, and what the user would see;
 - steps to reproduce, with **synthetic** test files (a zip, chat export, backup file or link you made yourself). Never send real evidence, real chats or anyone's personal data.
 
@@ -34,7 +34,7 @@ What to expect: this is a volunteer project. We aim to acknowledge reports withi
 
 ### In scope
 
-Anything that could make Sakshya Kit:
+Anything that could make Saboot:
 
 - **show or print a wrong hash value**, or report a match for files that differ (for example in the hasher, the worker pool, the zip reader, the verify page or the PDFs);
 - **mis-attribute a WhatsApp message**: wrong author, wrong time, wrong text, or a wrong byte range or per-message hash in the transcript;
@@ -56,11 +56,11 @@ These are documented limitations, not vulnerabilities (see "Known limitations" i
 
 Also out of scope:
 
-- attacks that need an already compromised device, browser, browser extension or operating system, or physical access to an unlocked device (stored data is protected by the device and browser, not encrypted by Sakshya Kit);
+- attacks that need an already compromised device, browser, browser extension or operating system, or physical access to an unlocked device (stored data is protected by the device and browser, not encrypted by Saboot);
 - a compromised or malicious host serving modified code (host the app yourself from a release you have checked if this matters to you);
 - hosts that ignore `public/_headers`, as long as the `<meta>` Content-Security-Policy fallback still applies;
 - slowness or memory use when a user deliberately chooses a very large but valid file;
-- vulnerabilities in dependencies with no demonstrated effect on Sakshya Kit (please report those upstream; you are welcome to tell us too).
+- vulnerabilities in dependencies with no demonstrated effect on Saboot (please report those upstream; you are welcome to tell us too).
 
 ## Threat model in brief
 
@@ -68,7 +68,7 @@ Also out of scope:
 
 **Who we defend against:** someone who hands the user a crafted file (for example an opposing party sending a zip, a "backup" or a QR link); someone who wants to read what the user is preparing; someone who wants a different file to pass as the original.
 
-**What we trust:** the user's device and browser, and the site that serves the app's code. Sakshya Kit has no server of its own, no accounts and no stored data off the device.
+**What we trust:** the user's device and browser, and the site that serves the app's code. Saboot has no server of its own, no accounts and no stored data off the device.
 
 ## Existing defences
 
@@ -81,7 +81,7 @@ Also out of scope:
 
 **Correct hashes**
 
-- MD5, SHA-1, SHA-256 and CRC32 come from a small Rust crate (`crates/sakshya-hash`) compiled to WebAssembly with a C ABI and no imports. The JavaScript bridge refuses a module whose ABI version or digest length does not match (`src/engine/hash/wasm-hasher.ts`).
+- MD5, SHA-1, SHA-256 and CRC32 come from a small Rust crate (`crates/saboot-hash`) compiled to WebAssembly with a C ABI and no imports. The JavaScript bridge refuses a module whose ABI version or digest length does not match (`src/engine/hash/wasm-hasher.ts`).
 - Files are streamed in 8 MiB chunks. If the number of bytes hashed differs from the file's size, hashing fails with a message instead of returning a result (`src/engine/hash/blob-hash.ts`).
 - Unit tests compare the wasm results with `node:crypto`. CI rebuilds the wasm from source with a pinned compiler and fails if it differs from the committed binary (`npm run wasm:check`).
 

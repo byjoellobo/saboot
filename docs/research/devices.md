@@ -1,4 +1,4 @@
-# Sakshya Kit: finding device identifiers for the BSA Section 63(4) certificate
+# Saboot: finding device identifiers for the BSA Section 63(4) certificate
 
 Research date: 2026-10-29. Prepared for the "device" section of the Schedule certificate under Section 63(4)(c), Bharatiya Sakshya Adhiniyam, 2023 (BSA).
 

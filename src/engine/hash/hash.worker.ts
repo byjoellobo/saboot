@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 // Dedicated worker: owns one instance of the Rust hasher and processes one
 // job at a time so the UI thread never blocks, even on multi-GB CCTV files.
-import wasmUrl from "./sakshya_hash.wasm?url";
+import wasmUrl from "./saboot_hash.wasm?url";
 import { hashBlob, HashCancelledError } from "./blob-hash";
 import type { WorkerRequest, WorkerResponse, ZipEntryOutcome } from "./protocol";
 import { HasherModule } from "./wasm-hasher";

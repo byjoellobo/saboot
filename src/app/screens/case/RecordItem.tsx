@@ -48,6 +48,10 @@ export function RecordItem({ record: r, caseFile: c, fresh, child = false, onCha
   const hasBlanks = /\[[^\]]+\]/.test(r.manner);
   const device = c.devices.find((d) => d.id === r.deviceId);
 
+  const meta = [KIND_NAMES[r.kind], shortSize(r.size), device ? `from ${device.nickname || device.makeModel}` : null]
+    .filter(Boolean)
+    .join(", ");
+
   return (
     <li className={child ? "record child" : "record"}>
       <div className="record-head">
@@ -56,49 +60,51 @@ export function RecordItem({ record: r, caseFile: c, fresh, child = false, onCha
         <HashedStamp fresh={fresh} />
       </div>
       <div className="record-meta">
-        {KIND_NAMES[r.kind]}, {shortSize(r.size)}
-        {r.crcOk === false && <span className="pill warn"> zip checksum mismatch</span>}
-        {!r.includeInCertificate && <span className="pill"> not on certificate</span>}
-        {!r.deviceId && r.includeInCertificate && <span className="pill warn"> no device yet</span>}
-        {device && <> · from {device.nickname || device.makeModel}</>}
+        <span>{meta}</span>
+        {r.crcOk === false && <span className="pill warn">zip checksum mismatch</span>}
+        {!r.includeInCertificate && <span className="pill">not on certificate</span>}
+        {!r.deviceId && r.includeInCertificate && <span className="pill warn">no device yet</span>}
+        <span className="spacer-auto">
+          <button
+            type="button"
+            className="btn link"
+            onClick={() => setOpen(!open)}
+            aria-expanded={open}
+            aria-label={`${open ? "Close" : "Open"} details of ${r.label}`}
+          >
+            {open ? "Close details" : "Details"}
+          </button>
+        </span>
       </div>
-      <div className="hash" style={{ gridTemplateColumns: "5.2rem 1fr auto" }}>
-        <span className="alg">SHA-256</span>
-        <span className="value">{r.hashes.sha256}</span>
-        <button
-          type="button"
-          className="btn link"
-          onClick={() => setOpen(!open)}
-          aria-expanded={open}
-          aria-label={`${open ? "Close" : "Open"} details of ${r.label}`}
-        >
-          {open ? "Close" : "Details"}
-        </button>
-      </div>
+      {!open && (
+        <div className="hash">
+          <span className="alg">SHA-256</span>
+          <span className="value">{r.hashes.sha256}</span>
+          <span />
+        </div>
+      )}
 
       {open && (
-        <div style={{ marginTop: "0.6rem" }}>
+        <div className="record-body">
           <HashLines hashes={r.hashes} of={r.label} />
           <p className="small">
             {formatBytes(r.size)}. Hashed {istStamp(new Date(r.hashedAt))}.
             {r.zipModified && ` Time stored in the zip: ${r.zipModified.replace("T", " ")} (device local time).`}
             {!r.zipModified && r.lastModified && ` File modified time reported by this device: ${istStamp(new Date(r.lastModified))}.`}
           </p>
-          <div className="row">
-            <div className="field">
-              <label htmlFor={`dev-${r.id}`}>Device it came from</label>
-              <select id={`dev-${r.id}`} value={r.deviceId ?? ""} onChange={(e) => onChange({ deviceId: e.target.value || null })}>
-                <option value="">Not set</option>
-                {c.devices.map((d) => (
-                  <option key={d.id} value={d.id}>
-                    {d.nickname || d.makeModel || "Unnamed device"}
-                  </option>
-                ))}
-              </select>
-              <span className="hint">
-                Missing? Add it under <a href={`#/case/${encodeURIComponent(c.id)}/devices`}>Devices</a>.
-              </span>
-            </div>
+          <div className="field">
+            <label htmlFor={`dev-${r.id}`}>Device it came from</label>
+            <select id={`dev-${r.id}`} value={r.deviceId ?? ""} onChange={(e) => onChange({ deviceId: e.target.value || null })}>
+              <option value="">Not set</option>
+              {c.devices.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.nickname || d.makeModel || "Unnamed device"}
+                </option>
+              ))}
+            </select>
+            <span className="hint">
+              Missing? Add it under <a href={`#/case/${encodeURIComponent(c.id)}/devices`}>Devices</a>.
+            </span>
           </div>
           <TextField
             label="What this record shows"
@@ -116,9 +122,11 @@ export function RecordItem({ record: r, caseFile: c, fresh, child = false, onCha
             multiline
           />
           {template && !r.manner && (
-            <button type="button" className="btn link" onClick={() => onChange({ manner: template })}>
-              Start from a template with blanks to fill
-            </button>
+            <p style={{ marginTop: "-0.6rem" }}>
+              <button type="button" className="btn link" onClick={() => onChange({ manner: template })}>
+                Start from a template with blanks to fill
+              </button>
+            </p>
           )}
           <Check
             label="List this record on the certificate and hash report"
@@ -127,7 +135,7 @@ export function RecordItem({ record: r, caseFile: c, fresh, child = false, onCha
           />
           {onRemove && (
             <div className="actions">
-              <button type="button" className="btn danger" onClick={onRemove} aria-label={`Remove ${r.label} from this case`}>
+              <button type="button" className="btn link danger-link" onClick={onRemove} aria-label={`Remove ${r.label} from this case`}>
                 Remove {r.label} from this case
               </button>
             </div>

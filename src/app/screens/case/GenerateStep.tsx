@@ -5,9 +5,11 @@ import { verifyItems } from "../../../sakshya/certificate/verify-items";
 import { hashCsv, sha256sums } from "../../../sakshya/certificate/hash-list";
 import type { ExpertDraft } from "../../../sakshya/model";
 import { announce } from "../../components/Announcer";
+import { Icon } from "../../components/icons";
 import { Check, Notice, Progress, SelectField, Stamp, TextField } from "../../components/ui";
 import { QrSvg } from "../../components/QrSvg";
 import { touch, withEvent } from "../../state/case-ops";
+import { usePersisted } from "../../state/persistence";
 import { getSetting, setSetting } from "../../state/db";
 import { exportBackup } from "../../services/backup";
 import { downloadBytes } from "../../services/download";
@@ -58,11 +60,11 @@ export function GenerateStep({ handle, caseFile: c }: StepProps) {
   const [verifyUrl, setVerifyUrl] = useState(defaultVerifyUrl());
   const [blankPartB, setBlankPartB] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [lastPdf, setLastPdf] = useState<GeneratedPdf | null>(null);
   const [transcriptProgress, setTranscriptProgress] = useState<{ done: number; total: number } | null>(null);
   const [ranges, setRanges] = useState<Record<string, { from: string; to: string; order: DateOrderChoice }>>({});
-  const [done, setDone] = useState<string | null>(null);
+  const [result, setResult] = useState<{ action: string; tone: "ok" | "warn"; text: string } | null>(null);
+  const persisted = usePersisted();
   const urlOk = parseHttpUrl(verifyUrl) !== null;
   const actor = c.party.name.trim() || "Case owner";
 
@@ -85,15 +87,14 @@ export function GenerateStep({ handle, caseFile: c }: StepProps) {
 
   const run = async (label: string, task: () => Promise<string>) => {
     setBusy(label);
-    setError(null);
-    setDone(null);
+    setResult(null);
     try {
       const message = await task();
-      setDone(message);
+      setResult({ action: label, tone: "ok", text: message });
       announce(message);
     } catch (e) {
       const message = e instanceof Error ? e.message : "Something went wrong while generating.";
-      setError(message);
+      setResult({ action: label, tone: "warn", text: message });
       announce(message);
     } finally {
       setBusy(null);
@@ -191,117 +192,140 @@ export function GenerateStep({ handle, caseFile: c }: StepProps) {
   );
   const firstQr = qrGroups[0] ? buildVerifyUrl(verifyUrl, { caseRef: c.caseNumber || c.title || "Case", items: qrGroups[0] }) : null;
 
+  const outcome = (action: string) =>
+    result && result.action === action ? (
+      <Notice tone={result.tone} level={2}>
+        {result.text}
+      </Notice>
+    ) : null;
+
   return (
     <>
       <h1 id="step-title" tabIndex={-1}>
         Check and generate
       </h1>
-
-      <h2>Before you generate</h2>
-      {issues.length === 0 ? (
-        <Notice tone="ok">
-          This checker found nothing missing. That does not mean the certificate is correct: have your advocate review it.
-        </Notice>
-      ) : (
-        <ul className="issues">
-          {issues.map((i, n) => (
-            <li key={n} className={i.severity}>
-              {i.message}
-            </li>
-          ))}
-        </ul>
-      )}
-
-      <h2>Hash values to declare</h2>
-      <p className="small">
-        The certificate offers SHA1, SHA256 and MD5. SHA-256 is the strongest of the three and is recommended. All three are always shown in
-        the hash report.
-      </p>
-      <div className="checks">
-        <Check label="SHA256 (recommended)" checked={c.algorithms.sha256} onChange={(v) => setAlg("sha256", v)} />
-        <Check label="SHA1" checked={c.algorithms.sha1} onChange={(v) => setAlg("sha1", v)} />
-        <Check label="MD5" checked={c.algorithms.md5} onChange={(v) => setAlg("md5", v)} />
-      </div>
-
-      <details>
-        <summary>
-          <strong>Expert's details for the Part B draft (optional)</strong>
-        </summary>
-        <p className="small">
-          Fill this only if you already know who will examine the records. Otherwise the draft leaves blanks for the expert. Who may sign
-          Part B is still an open question of law; ask your advocate.
-        </p>
-        <TextField label="Expert's name" value={c.expert.name} onChange={(v) => setExpert({ name: v })} />
-        <div className="row">
-          <SelectField label="Relation" value={c.expert.relationOf} onChange={(v) => setExpert({ relationOf: v })} options={RELATIONS} />
-          <TextField label="Name of parent or spouse" value={c.expert.relativeName} onChange={(v) => setExpert({ relativeName: v })} />
-        </div>
-        <TextField label="Designation" value={c.expert.designation} onChange={(v) => setExpert({ designation: v })} />
-        <TextField label="Residing or employed at" value={c.expert.address} onChange={(v) => setExpert({ address: v })} multiline />
-        <TextField label="Place" value={c.expert.place} onChange={(v) => setExpert({ place: v })} />
-      </details>
-
-      <h2>Certificate bundle</h2>
       <p>
-        One PDF with a guidance page, Part A filled in for each device, a watermarked Part B draft for the expert, a blank Part B, the hash
-        report (Annexure H) with QR codes, an expert's worksheet and the custody log.
+        Every document is made here, on this device, from the records and devices in this case. Generate again whenever something changes.
       </p>
-      <TextField
-        id="verify-url-field"
-        label="Address of the file-check page (used in the QR codes)"
-        value={verifyUrl}
-        onChange={setVerifyUrl}
-        mono
-        type="url"
-        message={
-          !urlOk
-            ? { severity: "error", text: "Enter a web address starting with https://" }
-            : isPublicUrl(verifyUrl)
-              ? null
-              : {
-                  severity: "warning",
-                  text: "Other people's phones can only open this if it is a public https:// address where Sakshya Kit is hosted.",
-                }
-        }
-      />
-      <Check label="Include a blank Part B for the expert to fill by hand" checked={blankPartB} onChange={setBlankPartB} />
-      <div className="actions">
-        <button type="button" className="btn" disabled={blocked || !urlOk || busy !== null} onClick={() => void makeCertificate()}>
-          {busy === "certificate" ? "Generating…" : "Generate certificate bundle (PDF)"}
-        </button>
-      </div>
-      {blocked && <p className="small">Fix the items marked ✕ above first.</p>}
 
-      {firstQr && urlOk && (
-        <div className="row" style={{ alignItems: "center" }}>
-          <QrSvg text={firstQr} size={132} title="QR code to check the files" />
-          <p className="small" style={{ maxWidth: "40ch" }}>
-            This QR code is printed on the certificate. Scanning it opens a page that checks a file against the hash values on this device,
-            without uploading it. <a href={firstQr}>Try it</a>.
-            {qrGroups.length > 1 && ` The hash report has ${qrGroups.length} QR codes, one for each group of records.`}
-          </p>
-        </div>
-      )}
+      <section className="panel" aria-labelledby="checks-title">
+        <h2 id="checks-title" style={{ marginTop: 0 }}>
+          Before you generate
+        </h2>
+        {issues.length === 0 ? (
+          <Notice tone="ok">
+            This checker found nothing missing. That does not mean the certificate is correct: have your advocate review it.
+          </Notice>
+        ) : (
+          <ul className="issues">
+            {issues.map((i, n) => (
+              <li key={n} className={i.severity}>
+                <Icon name={i.severity === "error" ? "cross" : "alert"} size={18} />
+                <span>
+                  <strong>{i.severity === "error" ? "Needed: " : "Check: "}</strong>
+                  {i.message}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
-      {lastPdf && (
-        <Notice title="Optional: add an RFC 3161 timestamp">
-          <p>
-            A Time Stamping Authority (TSA) can sign the PDF's hash together with the current time, as evidence that this exact document
-            existed by then. This uses the internet for a moment: only the PDF's hash is sent, never the PDF, but the service will see your
-            IP address and the time. It is a free third-party service ({new URL(DEFAULT_TSA_URL).host}), not a government or accredited one;
-            ask your advocate whether a timestamp helps in your case.
+      <section className="output" aria-labelledby="bundle-title">
+        <h2 id="bundle-title">Certificate bundle</h2>
+        <p>
+          One PDF with a guidance page, Part A filled in for each device, a watermarked Part B draft for the expert, a blank Part B, the
+          hash report (Annexure H) with QR codes, an expert's worksheet and the custody log.
+        </p>
+
+        <fieldset>
+          <legend>Hash values to declare on the certificate</legend>
+          <div className="checks">
+            <Check label="SHA256 (recommended)" checked={c.algorithms.sha256} onChange={(v) => setAlg("sha256", v)} />
+            <Check label="SHA1" checked={c.algorithms.sha1} onChange={(v) => setAlg("sha1", v)} />
+            <Check label="MD5" checked={c.algorithms.md5} onChange={(v) => setAlg("md5", v)} />
+          </div>
+          <p className="small">SHA-256 is the strongest of the three. All three are always printed in the hash report.</p>
+        </fieldset>
+
+        <details>
+          <summary>
+            <strong>Expert's details for the Part B draft (optional)</strong>
+          </summary>
+          <p className="small">
+            Fill this only if you already know who will examine the records. Otherwise the draft leaves blanks for the expert. Who may sign
+            Part B is still an open question of law; ask your advocate.
           </p>
-          <button type="button" className="btn secondary" disabled={busy !== null} onClick={() => void addTimestamp()}>
-            {busy === "timestamp"
-              ? "Contacting the timestamp service…"
-              : `Send the PDF's hash to ${new URL(DEFAULT_TSA_URL).host} for a timestamp`}
+          <TextField label="Expert's name" value={c.expert.name} onChange={(v) => setExpert({ name: v })} />
+          <div className="row">
+            <SelectField label="Relation" value={c.expert.relationOf} onChange={(v) => setExpert({ relationOf: v })} options={RELATIONS} />
+            <TextField label="Name of parent or spouse" value={c.expert.relativeName} onChange={(v) => setExpert({ relativeName: v })} />
+          </div>
+          <TextField label="Designation" value={c.expert.designation} onChange={(v) => setExpert({ designation: v })} />
+          <TextField label="Residing or employed at" value={c.expert.address} onChange={(v) => setExpert({ address: v })} multiline />
+          <TextField label="Place" value={c.expert.place} onChange={(v) => setExpert({ place: v })} />
+        </details>
+
+        <TextField
+          id="verify-url-field"
+          label="Address of the file-check page (used in the QR codes)"
+          value={verifyUrl}
+          onChange={setVerifyUrl}
+          mono
+          type="url"
+          message={
+            !urlOk
+              ? { severity: "error", text: "Enter a web address starting with https://" }
+              : isPublicUrl(verifyUrl)
+                ? null
+                : {
+                    severity: "warning",
+                    text: "Other people's phones can only open this if it is a public https:// address where Saboot is hosted.",
+                  }
+          }
+        />
+        <Check label="Include a blank Part B for the expert to fill by hand" checked={blankPartB} onChange={setBlankPartB} />
+        <div className="actions">
+          <button type="button" className="btn" disabled={blocked || !urlOk || busy !== null} onClick={() => void makeCertificate()}>
+            <Icon name="download" size={18} />
+            {busy === "certificate" ? "Generating…" : "Generate certificate bundle (PDF)"}
           </button>
-        </Notice>
-      )}
+          {blocked && <span className="small">Fix the items marked "Needed" above first.</span>}
+        </div>
+        {outcome("certificate")}
+
+        {firstQr && urlOk && (
+          <div className="qr-row">
+            <QrSvg text={firstQr} size={128} title="QR code to check the files" />
+            <p className="small" style={{ maxWidth: "42ch", margin: 0 }}>
+              This QR code is printed on the certificate. Scanning it opens a page that checks a file against the hash values on the
+              scanning device, without uploading it. <a href={firstQr}>Try it</a>.
+              {qrGroups.length > 1 && ` The hash report has ${qrGroups.length} QR codes, one for each group of records.`}
+            </p>
+          </div>
+        )}
+
+        {lastPdf && (
+          <Notice title="Optional: add an RFC 3161 timestamp">
+            <p>
+              A Time Stamping Authority (TSA) can sign the PDF's hash together with the current time, as evidence that this exact document
+              existed by then. This uses the internet for a moment: only the PDF's hash is sent, never the PDF, but the service will see
+              your IP address and the time. It is a free third-party service ({new URL(DEFAULT_TSA_URL).host}), not a government or
+              accredited one; ask your advocate whether a timestamp helps in your case.
+            </p>
+            <button type="button" className="btn secondary" disabled={busy !== null} onClick={() => void addTimestamp()}>
+              {busy === "timestamp"
+                ? "Contacting the timestamp service…"
+                : `Send the PDF's hash to ${new URL(DEFAULT_TSA_URL).host} for a timestamp`}
+            </button>
+          </Notice>
+        )}
+        {outcome("timestamp")}
+      </section>
 
       {chats.length > 0 && (
-        <>
-          <h2>WhatsApp transcripts</h2>
+        <section className="output" aria-labelledby="transcripts-title">
+          <h2 id="transcripts-title">WhatsApp transcripts</h2>
           <p>
             A page-numbered transcript with every message's own hash and byte position, so any single message can be checked against the
             original export. You can limit it to a period.
@@ -314,8 +338,9 @@ export function GenerateStep({ handle, caseFile: c }: StepProps) {
                 <div className="record-head">
                   <Stamp>{r.label}</Stamp>
                   <span className="name">{r.zipPath ?? r.fileName}</span>
+                  <span />
                 </div>
-                <div className="row">
+                <div className="row" style={{ marginTop: "0.6rem" }}>
                   <TextField label="From (optional)" type="date" value={range.from} onChange={(v) => setRange({ from: v })} />
                   <TextField label="To (optional)" type="date" value={range.to} onChange={(v) => setRange({ to: v })} />
                   <SelectField<DateOrderChoice>
@@ -325,47 +350,55 @@ export function GenerateStep({ handle, caseFile: c }: StepProps) {
                     options={DATE_ORDERS}
                     hint="Change only if the transcript shows dates the wrong way round."
                   />
+                </div>
+                <div className="actions" style={{ marginTop: 0 }}>
                   <button type="button" className="btn" disabled={busy !== null} onClick={() => void makeTranscript(r.id)}>
+                    <Icon name="download" size={18} />
                     {busy === `transcript-${r.id}` ? "Building…" : "Generate transcript (PDF)"}
                   </button>
                 </div>
                 {busy === `transcript-${r.id}` && transcriptProgress && (
                   <Progress done={transcriptProgress.done} total={transcriptProgress.total} label="Building transcript" />
                 )}
+                {outcome(`transcript-${r.id}`)}
               </div>
             );
           })}
-        </>
+        </section>
       )}
 
-      <h2>Hash lists for experts</h2>
-      <p className="small">
-        A <code>SHA256SUMS</code> file lets an expert check every file in one command (<code>sha256sum -c</code>), and a CSV opens in any
-        spreadsheet. Both list the records included on the certificate.
-      </p>
-      <button type="button" className="btn secondary" disabled={busy !== null} onClick={() => void makeHashLists()}>
-        Download hash lists
-      </button>
-
-      <h2>Backup</h2>
-      <p className="small">
-        Cases live only in this browser. Download a backup to keep the case details, hashes, custody log and chat text safe or to move them
-        to another device. Your media files are not inside the backup; keep the originals.
-      </p>
-      <button type="button" className="btn secondary" disabled={busy !== null} onClick={() => void makeBackup()}>
-        Download case backup
-      </button>
-
-      {done && (
-        <div style={{ marginTop: "1rem" }}>
-          <Notice tone="ok">{done}</Notice>
+      <section className="output" aria-labelledby="lists-title">
+        <h2 id="lists-title">Hash lists for experts</h2>
+        <p>
+          A <code>SHA256SUMS</code> file lets an expert check every file in one command (<code>sha256sum -c</code>), and a CSV opens in any
+          spreadsheet. Both list the records included on the certificate.
+        </p>
+        <div className="actions">
+          <button type="button" className="btn secondary" disabled={busy !== null} onClick={() => void makeHashLists()}>
+            <Icon name="download" size={18} />
+            Download hash lists
+          </button>
         </div>
-      )}
-      {error && (
-        <div style={{ marginTop: "1rem" }}>
-          <Notice tone="warn">{error}</Notice>
+        {outcome("hash-lists")}
+      </section>
+
+      <section className="output" aria-labelledby="backup-title">
+        <h2 id="backup-title">Backup</h2>
+        <p>
+          Cases live only in this browser. Download a backup to keep the case details, hashes, custody log and chat text safe, or to move
+          them to another device. Your media files are not inside the backup; keep the originals.
+        </p>
+        {persisted === false && (
+          <Notice tone="quiet">This browser may clear saved cases when the device is low on space, so keep a backup of this case.</Notice>
+        )}
+        <div className="actions">
+          <button type="button" className="btn secondary" disabled={busy !== null} onClick={() => void makeBackup()}>
+            <Icon name="download" size={18} />
+            Download case backup
+          </button>
         </div>
-      )}
+        {outcome("backup")}
+      </section>
     </>
   );
 }

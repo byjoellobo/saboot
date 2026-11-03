@@ -16,7 +16,7 @@ let dbPromise: Promise<IDBPDatabase<SakshyaDB>> | null = null;
 
 function db(): Promise<IDBPDatabase<SakshyaDB>> {
   if (!dbPromise) {
-    const opening = openDB<SakshyaDB>("sakshya-kit", 1, {
+    const opening = openDB<SakshyaDB>("saboot", 1, {
       upgrade(database) {
         database.createObjectStore("cases", { keyPath: "id" });
         const chats = database.createObjectStore("chats", { keyPath: "recordId" });
@@ -92,17 +92,17 @@ export async function setSetting(key: string, value: unknown): Promise<void> {
   await (await db()).put("settings", value, key);
 }
 
-/** Remove every case, chat text and setting stored by Sakshya Kit on this device. */
+/** Remove every case, chat text and setting stored by Saboot on this device. */
 export async function deleteAllData(): Promise<void> {
   if (dbPromise) {
     (await dbPromise).close();
     dbPromise = null;
   }
   await new Promise<void>((resolve, reject) => {
-    const req = indexedDB.deleteDatabase("sakshya-kit");
+    const req = indexedDB.deleteDatabase("saboot");
     req.onsuccess = () => resolve();
     req.onerror = () => reject(req.error ?? new Error("Could not delete the data"));
-    req.onblocked = () => reject(new Error("Close Sakshya Kit in other tabs, then try again."));
+    req.onblocked = () => reject(new Error("Close Saboot in other tabs, then try again."));
   });
 }
 

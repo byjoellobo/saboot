@@ -80,7 +80,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "sakshya-hash"
+name = "saboot-hash"
 version = "0.1.0"
 dependencies = [
  "crc32fast",

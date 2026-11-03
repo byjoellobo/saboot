@@ -1,6 +1,6 @@
 # Privacy
 
-This page explains, in plain words, what Sakshya Kit keeps, where it keeps it, and what (if anything) leaves your device.
+This page explains, in plain words, what Saboot keeps, where it keeps it, and what (if anything) leaves your device.
 
 ## The short version
 
@@ -10,11 +10,11 @@ This page explains, in plain words, what Sakshya Kit keeps, where it keeps it, a
 - There are no accounts, no analytics, no cookies, no ads and no tracking.
 - You can delete everything at any time.
 
-The people who make Sakshya Kit never receive your files or your case details, so we cannot see, correct or delete them for you. They are only on your device.
+The people who make Saboot never receive your files or your case details, so we cannot see, correct or delete them for you. They are only on your device.
 
-## What Sakshya Kit stores
+## What Saboot stores
 
-Sakshya Kit saves your work in this browser's own storage (called IndexedDB), so you can close the page and come back later. It stores:
+Saboot saves your work in this browser's own storage (called IndexedDB), so you can close the page and come back later. It stores:
 
 - **Case details** you type in: the case title, court and case number; your name, your parent's or spouse's name, your address and place; and the same details and designation for the expert.
 - **Records**: for each file you add, its name, type, size, dates, its hash values (MD5, SHA-1, SHA-256) and any description you type. For files inside a zip, the path inside the zip.
@@ -27,19 +27,19 @@ It **never stores your media files**. Photos, screenshots, recordings, videos, d
 
 ## Where it is stored
 
-Only in this browser, on this device. It is not copied to any server, and it does not move to your other devices or browsers. If you open Sakshya Kit in a different browser, it will be empty there.
+Only in this browser, on this device. It is not copied to any server, and it does not move to your other devices or browsers. If you open Saboot in a different browser, it will be empty there.
 
-Sakshya Kit does not encrypt what it stores. Anyone who can open this browser on this device could see your cases. Use a screen lock, and avoid shared or public computers. A private or incognito window may not keep your work after you close it.
+Saboot does not encrypt what it stores. Anyone who can open this browser on this device could see your cases. Use a screen lock, and avoid shared or public computers. A private or incognito window may not keep your work after you close it.
 
-Sakshya Kit asks the browser to keep its data even when the device is low on space. Some browsers may still remove it, so download a backup of any case you need to keep.
+Saboot asks the browser to keep its data even when the device is low on space. Some browsers may still remove it, so download a backup of any case you need to keep.
 
 ## What leaves your device
 
 **Your files and case details: nothing.** Hashing, reading WhatsApp chats and making PDFs all happen inside your browser. The app's security settings block it from contacting any other website, except the one below.
 
-**The optional timestamp.** On the Generate step you can ask for a trusted timestamp for a PDF. Only when you press that button, Sakshya Kit sends a SHA-256 hash computed from the PDF (a short fixed-length code) to the timestamp service at `rfc3161.ai.moda`. The PDF itself is not sent, and the PDF cannot be rebuilt from its hash. Like any website, the timestamp service can see your internet (IP) address, the time of the request, and the address of the site you are using Sakshya Kit from. It sends back a signed time, which is added to your PDF. If you never press the button, nothing is sent.
+**The optional timestamp.** On the Generate step you can ask for a trusted timestamp for a PDF. Only when you press that button, Saboot sends a SHA-256 hash computed from the PDF (a short fixed-length code) to the timestamp service at `rfc3161.ai.moda`. The PDF itself is not sent, and the PDF cannot be rebuilt from its hash. Like any website, the timestamp service can see your internet (IP) address, the time of the request, and the address of the site you are using Saboot from. It sends back a signed time, which is added to your PDF. If you never press the button, nothing is sent.
 
-**Opening the app.** Sakshya Kit is a website. When you open it, the server that hosts it sees an ordinary web request (your IP address, the time and your browser type), as with any website. It does not see your cases or files. After the first visit, the app is saved on your device and works offline.
+**Opening the app.** Saboot is a website. When you open it, the server that hosts it sees an ordinary web request (your IP address, the time and your browser type), as with any website. It does not see your cases or files. After the first visit, the app is saved on your device and works offline.
 
 **Files you download and share yourself.** PDFs and backup files you download are ordinary files on your device. Where they go next is up to you. A backup file contains your case details, device details, custody log and WhatsApp chat text, and it is not encrypted, so keep it safe.
 
@@ -53,19 +53,19 @@ When someone uses the check page, the file they choose is hashed on their own de
 
 ## No accounts, analytics or cookies
 
-Sakshya Kit has no sign-up and no login. It does not use cookies, analytics, advertising, tracking pixels, crash reporting or any third-party service, apart from the optional timestamp described above.
+Saboot has no sign-up and no login. It does not use cookies, analytics, advertising, tracking pixels, crash reporting or any third-party service, apart from the optional timestamp described above.
 
 ## How to delete your data
 
 - **Delete one case:** on the **Cases** screen, choose **Delete** next to the case. This removes the case and its stored WhatsApp chat text from this browser.
-- **Delete everything:** open **About the certificate**, go to "Your data on this device" and choose **Delete all data on this device**. This removes every case, chat text and setting that Sakshya Kit stored in this browser.
+- **Delete everything:** open **About the certificate**, go to "Your data on this device" and choose **Delete all data on this device**. This removes every case, chat text and setting that Saboot stored in this browser.
 - **Remove the app completely:** clear the site's data in your browser settings (often called "Site settings", "Clear browsing data" or "Manage website data"). This also removes the offline copy of the app. If you installed it as an app, uninstall it as well.
 
-Deleting data in Sakshya Kit does not touch your original files, or PDFs and backups you have already downloaded. Delete those separately if you want to. Download a backup first if you may need a case later: deleted data cannot be recovered.
+Deleting data in Saboot does not touch your original files, or PDFs and backups you have already downloaded. Delete those separately if you want to. Download a backup first if you may need a case later: deleted data cannot be recovered.
 
 ## Changes to this page
 
-If what Sakshya Kit stores or sends ever changes, this page and the [changelog](CHANGELOG.md) will say so.
+If what Saboot stores or sends ever changes, this page and the [changelog](CHANGELOG.md) will say so.
 
 ## Questions
 

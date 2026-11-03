@@ -29,7 +29,7 @@ export async function readExpectedList(file: File): Promise<ExpectedList> {
       throw new Error("This file looks like JSON but could not be read.");
     }
     const parsed = backupSchema.safeParse(raw);
-    if (!parsed.success) throw new Error("This JSON file is not a Sakshya Kit case backup.");
+    if (!parsed.success) throw new Error("This JSON file is not a Saboot case backup.");
     const c = parsed.data.caseFile;
     const items = c.records
       .filter((r) => r.includeInCertificate)
@@ -43,7 +43,7 @@ export async function readExpectedList(file: File): Promise<ExpectedList> {
     return { source: `case backup "${file.name}"`, caseRef: cleanLinkText(caseRef), items };
   }
   const sums = parseSha256sums(text);
-  if (sums.length === 0) throw new Error("No SHA-256 lines were found. Choose a SHA256SUMS file or a Sakshya Kit backup.");
+  if (sums.length === 0) throw new Error("No SHA-256 lines were found. Choose a SHA256SUMS file or a Saboot backup.");
   return {
     source: `hash list "${file.name}"`,
     caseRef: file.name,

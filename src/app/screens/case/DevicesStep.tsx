@@ -53,7 +53,7 @@ export function DevicesStep({ handle, caseFile: c }: StepProps) {
       {c.devices.map((d) => {
         const recs = c.records.filter((r) => r.deviceId === d.id);
         return (
-          <div key={d.id} className="record">
+          <div key={d.id} className="device-row">
             <div className="record-head">
               <span className="name">{deviceTitle(d)}</span>
               <button type="button" className="btn link" onClick={() => setEditing(d)} aria-label={`Edit ${deviceTitle(d)}`}>

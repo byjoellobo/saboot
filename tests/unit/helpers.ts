@@ -7,7 +7,7 @@ let cached: Promise<HasherModule> | null = null;
 
 /** Load the real Rust-built wasm, exactly as the browser worker does. */
 export function loadHasher(): Promise<HasherModule> {
-  cached ??= HasherModule.load(readFileSync(resolve(import.meta.dirname, "../../src/engine/hash/sakshya_hash.wasm")));
+  cached ??= HasherModule.load(readFileSync(resolve(import.meta.dirname, "../../src/engine/hash/saboot_hash.wasm")));
   return cached;
 }
 

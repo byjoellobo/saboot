@@ -14,7 +14,7 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, State> {
 
   override componentDidCatch(error: Error, info: ErrorInfo): void {
     // Kept on this device only; there is no remote error reporting.
-    console.error("Sakshya Kit crashed", error, info.componentStack);
+    console.error("Saboot crashed", error, info.componentStack);
   }
 
   override render(): ReactNode {

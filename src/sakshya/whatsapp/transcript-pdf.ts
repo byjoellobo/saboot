@@ -133,7 +133,7 @@ async function summary(w: PdfWriter, opts: TranscriptOptions, shown: readonly Ch
       "Message boundaries",
       [{ text: chat.boundaryMethod === "crlf-records" ? "exact (iOS record terminators)" : "by date/time header lines (see limitations)" }],
     ],
-    ["Generated", [{ text: `${istStamp(opts.generatedAt)} with Sakshya Kit ${opts.appVersion}` }]],
+    ["Generated", [{ text: `${istStamp(opts.generatedAt)} with Saboot ${opts.appVersion}` }]],
   ];
   await w.table(
     [
@@ -209,7 +209,7 @@ export async function buildTranscriptPdf(opts: TranscriptOptions): Promise<Uint8
 
   const short = `${opts.chatFile.sha256.slice(0, 16)}…`;
   return w.finish((n, total) => ({
-    left: `Transcript of ${opts.chatFile.label} (chat file SHA-256 ${short}) · Sakshya Kit ${opts.appVersion} · not legal advice`,
+    left: `Transcript of ${opts.chatFile.label} (chat file SHA-256 ${short}) · Saboot ${opts.appVersion} · not legal advice`,
     right: `Page ${n} of ${total}`,
   }));
 }

@@ -176,7 +176,7 @@ export function encodePayload(payload: VerifyPayload): string {
 
 export function decodePayload(fragment: string): VerifyPayload {
   const text = fragment.replace(/^#/, "");
-  if (!text.startsWith(PREFIX)) throw new VerifyLinkError("This link was not made by a compatible version of Sakshya Kit");
+  if (!text.startsWith(PREFIX)) throw new VerifyLinkError("This link was not made by a compatible version of Saboot");
   const body = text.slice(PREFIX.length);
   if (body.length > MAX_ENCODED) throw new VerifyLinkError("Link is too long");
   let bytes: Uint8Array;

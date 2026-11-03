@@ -8,7 +8,7 @@ body:
       value: |
         Thank you for the suggestion.
 
-        Sakshya Kit keeps every file and case detail on the user's device. It has no accounts, analytics or uploads, and it is not legal advice. Requests that need any of those are unlikely to be accepted, but tell us the problem anyway: there may be another way to solve it.
+        Saboot keeps every file and case detail on the user's device. It has no accounts, analytics or uploads, and it is not legal advice. Requests that need any of those are unlikely to be accepted, but tell us the problem anyway: there may be another way to solve it.
 
         **Do not include personal data** such as real chats, phone numbers, IMEIs, names or case details.
   - type: checkboxes

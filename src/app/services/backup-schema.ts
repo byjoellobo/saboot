@@ -91,7 +91,8 @@ export const caseSchema = z.object({
 });
 
 export const backupSchema = z.object({
-  format: z.literal("sakshya-kit-backup"),
+  // "sakshya-kit-backup" was the format name before the project was renamed Saboot.
+  format: z.enum(["saboot-backup", "sakshya-kit-backup"]),
   version: z.literal(1),
   exportedAt: text(40),
   appVersion: text(40),

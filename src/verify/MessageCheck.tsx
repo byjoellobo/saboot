@@ -1,4 +1,4 @@
-// Check one WhatsApp message from a Sakshya Kit transcript: the transcript
+// Check one WhatsApp message from a Saboot transcript: the transcript
 // prints "bytes START-END" and a SHA-256 under every message. This hashes
 // exactly that slice of the original chat file, on this device.
 import { useState } from "react";
@@ -44,14 +44,31 @@ export function MessageCheck() {
 
   return (
     <section aria-labelledby="msg-check-title">
-      <h2 id="msg-check-title">Check one WhatsApp message</h2>
+      <h2 id="msg-check-title" style={{ marginTop: 0 }}>
+        Check one WhatsApp message
+      </h2>
       <p className="small">
-        Under each message, a Sakshya Kit transcript prints <code>bytes START–END</code> and a SHA-256 value. Choose the original chat file
-        and enter those numbers to see the exact text and its hash. Nothing is uploaded.
+        Under each message, a Saboot transcript prints <code>bytes START–END</code> and a SHA-256 value. Choose the original chat file and
+        enter those numbers to see the exact text and its hash. Nothing is uploaded.
       </p>
       <div className="field">
-        <label htmlFor="msg-file">Chat file</label>
-        <input id="msg-file" type="file" accept=".txt,text/plain" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
+        <span className="label" id="msg-file-label">
+          Chat file
+        </span>
+        <div className="file-pick">
+          <label className="btn secondary" htmlFor="msg-file">
+            Choose the chat file
+          </label>
+          <input
+            id="msg-file"
+            className="visually-hidden"
+            type="file"
+            accept=".txt,text/plain"
+            aria-labelledby="msg-file-label"
+            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+          />
+          <span className="file-name">{file ? file.name : "No file chosen"}</span>
+        </div>
       </div>
       <div className="row">
         <TextField label="Start byte" value={start} onChange={setStart} mono inputMode="numeric" />

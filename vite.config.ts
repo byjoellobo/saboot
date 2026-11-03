@@ -26,13 +26,13 @@ const CSP = [
 ].join("; ");
 
 const cspMeta: Plugin = {
-  name: "sakshya-csp-meta",
+  name: "saboot-csp-meta",
   apply: "build",
   transformIndexHtml: () => [{ tag: "meta", attrs: { "http-equiv": "Content-Security-Policy", content: CSP }, injectTo: "head-prepend" }],
 };
 
-// Set SAKSHYA_BASE=/repo-name/ to host under a sub-path (e.g. GitHub Pages).
-const base = process.env.SAKSHYA_BASE ?? "/";
+// Set SABOOT_BASE=/repo-name/ to host under a sub-path (e.g. GitHub Pages).
+const base = process.env.SABOOT_BASE ?? "/";
 
 export default defineConfig({
   base,
@@ -45,10 +45,10 @@ export default defineConfig({
     VitePWA({
       registerType: "prompt",
       injectRegister: false,
-      includeAssets: ["favicon.svg", "logo.svg", "fonts/*.ttf", "fonts/OFL.txt"],
+      includeAssets: ["favicon.svg", "logo.svg", "fonts/*.ttf", "fonts/ui/*.woff2", "fonts/OFL.txt"],
       manifest: {
-        name: "Sakshya Kit: electronic evidence certificate helper",
-        short_name: "Sakshya Kit",
+        name: "Saboot: electronic evidence certificate helper",
+        short_name: "Saboot",
         description:
           "Hash WhatsApp chats, screenshots, recordings and CCTV files on your own device and draft the Section 63(4) BSA certificate. Not legal advice.",
         lang: "en-IN",
@@ -65,7 +65,7 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ["**/*.{js,css,html,wasm,svg,png,ico,ttf,txt,webmanifest}"],
+        globPatterns: ["**/*.{js,css,html,wasm,svg,png,ico,ttf,woff2,txt,webmanifest}"],
         maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
         navigateFallback: "index.html",
         navigateFallbackDenylist: [/\/verify\.html/],
